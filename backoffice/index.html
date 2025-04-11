@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Client - MovieVibe</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script defer src="script.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="logo.png" alt="Logo MovieVibe" />
+        <h2>MovieVibe</h2>
+      </div>
+      <nav class="menu">
+        <a class="active" data-attr="client"><i class="fas fa-user"></i> Client</a>
+        <a data-attr="event"><i class="fas fa-calendar"></i> Événement</a>
+        <a data-attr="catalogue"><i class="fas fa-film"></i> Reclmation</a>
+        <a data-attr="achat"><i class="fas fa-shopping-cart"></i> Produit</a>
+        <a data-attr="reclamation"><i class="fas fa-bell"></i> Film</a>
+        <button id="quitBtn"><i class="fas fa-sign-out-alt"></i> Quitter</button>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="search-zone">
+          <input type="text" id="searchInput" placeholder="🔍 Rechercher un produits..." />
+        </div>
+      </header>
+      <section class="content">
+        <div class="content-header">
+          <h1>👥 Liste des produits</h1>
+          <div class="btn-group">
+            <button id="addClientBtn"><i class="fas fa-plus"></i> Ajouter</button>
+            <button id="downloadBtn"><i class="fas fa-download"></i> Télécharger</button>
+            <button id="shareBtn"><i class="fas fa-share-alt"></i> Partager</button>
+          </div>
+        </div>
+
+        <table id="clientTable" class="animated-table">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Type (Film ou Série)</th>
+              <th>Genre</th>
+              <th>Année de sortie</th>
+              <th>Durée</th>
+              <th>Âge recommandé</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Breaking Bad</td>
+              <td>Série</td>
+              <td>Drame, Thriller</td>
+              <td>2008</td>
+              <td> 47 minutes par épisode ou 2h 10min pour un film</td>
+              <td>18+</td>
+            </tr>
+          </tbody>
+        </table>    
+      </section>
+    </main>
+  </div>
+</body>
+</html>
