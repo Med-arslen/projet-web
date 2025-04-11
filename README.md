@@ -9,9 +9,6 @@ Ce projet est une plateforme web complète, composée de deux parties principale
 
 proj web/ ├── backoffice/ # Interface d’administration └── projet/ # Site principal visible par les utilisateurs
 
-bash
-Copier
-Modifier
 
 ## 🚀 Instructions d’installation
 
@@ -20,9 +17,7 @@ Modifier
    git clone https://github.com/Med-arslen/projet-web.git
 Naviguer dans le dossier :
 
-bash
-Copier
-Modifier
+
 cd "projet-web"
 Lancer votre serveur local (ex. XAMPP, Laragon, WAMP, etc.)
 
