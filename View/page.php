@@ -8,6 +8,36 @@
   <link rel="stylesheet" href="style.css">
   <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
   <script defer src="scriptpage.js"></script>
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content {
+      margin: auto;
+      display: block;
+      width: 50%;
+      max-width: 500px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      color: white;
+      font-size: 35px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="wrapper">
@@ -76,6 +106,11 @@
       </div>
     </section>
 
+    <div id="imageModal" class="modal">
+      <span class="modal-close">&times;</span>
+      <img class="modal-content" id="modalImage">
+    </div>
+
     <!-- LINKS -->
     <section class="link">
       <div class="logos">
@@ -107,5 +142,19 @@
       <p>&copy; 2025 MovieVibe. Tous droits réservés.</p>
     </footer>
   </div>
+  <script>
+    document.querySelectorAll('.product-item img').forEach(img => {
+      img.addEventListener('click', function() {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        modal.style.display = 'block';
+        modalImg.src = this.src;
+      });
+    });
+
+    document.querySelector('.modal-close').addEventListener('click', function() {
+      document.getElementById('imageModal').style.display = 'none';
+    });
+  </script>
 </body>
 </html>
