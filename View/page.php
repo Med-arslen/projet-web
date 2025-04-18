@@ -18,24 +18,116 @@
       width: 100%;
       height: 100%;
       overflow: auto;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.9);
     }
 
     .modal-content {
       margin: auto;
       display: block;
-      width: 50%;
-      max-width: 500px;
+      width: 90%;
+      max-width: 1000px;
+      background-color: #141414;
+      padding: 30px;
+      border-radius: 12px;
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
     }
 
     .modal-close {
       position: absolute;
-      top: 10px;
-      right: 25px;
-      color: white;
-      font-size: 35px;
-      font-weight: bold;
+      right: 20px;
+      top: 20px;
+      color: #ffffff;
+      font-size: 30px;
       cursor: pointer;
+      z-index: 1001;
+      background: none;
+      border: none;
+      transition: color 0.3s ease;
+    }
+
+    .modal-close:hover {
+      color: #e50914;
+    }
+
+    .product-details {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .product-image {
+      flex: 0 0 45%;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
+    }
+
+    .product-image img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .product-image img:hover {
+      transform: scale(1.05);
+    }
+
+    .product-info {
+      flex: 0 0 55%;
+      padding: 20px;
+    }
+
+    .product-info h2 {
+      font-size: 2.2em;
+      color: #ffffff;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e50914;
+      padding-bottom: 10px;
+    }
+
+    .product-info p {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      color: #cccccc;
+    }
+
+    .product-info .price-tag {
+      font-size: 1.8em;
+      color: #e50914;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .product-info .quantity-tag {
+      background-color: rgba(229, 9, 20, 0.1);
+      padding: 10px 15px;
+      border-radius: 6px;
+      display: inline-block;
+      margin: 10px 0;
+    }
+
+    #modalAddToCart {
+      background-color: #e50914;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 6px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+      width: auto;
+    }
+
+    #modalAddToCart:hover {
+      background-color: #ff0f1a;
     }
   </style>
 </head>
@@ -140,7 +232,29 @@
 
     <div id="imageModal" class="modal">
       <span class="modal-close">&times;</span>
-      <img class="modal-content" id="modalImage">
+      <div class="modal-content">
+        <div class="product-details">
+          <div class="product-image">
+            <img id="modalImage" src="" alt="Product Image">
+          </div>
+          <div class="product-info">
+            <h2 id="modalProductName"></h2>
+            <div class="price-tag">
+              <span id="modalProductPrice"></span> €
+            </div>
+            <div class="description-section">
+              <p><strong>Description:</strong></p>
+              <p id="modalProductDescription"></p>
+            </div>
+            <div class="quantity-tag">
+              <strong>Stock disponible: </strong><span id="modalProductQuantity"></span> unités
+            </div>
+            <button class="add-to-cart" id="modalAddToCart">
+              <i class="fas fa-shopping-cart"></i> Ajouter au panier
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- LINKS -->
@@ -177,15 +291,43 @@
   <script>
     document.querySelectorAll('.product-item img').forEach(img => {
       img.addEventListener('click', function() {
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        modal.style.display = 'block';
-        modalImg.src = this.src;
+        const productId = this.closest('.product-item').querySelector('.add-to-cart').dataset.productId;
+        fetch(`showproduct.php?id=${productId}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              const modal = document.getElementById('imageModal');
+              const modalImg = document.getElementById('modalImage');
+              const product = data.produit;
+              
+              modalImg.src = `../uploads/${product.image}`;
+              document.getElementById('modalProductName').textContent = product.nom;
+              document.getElementById('modalProductDescription').textContent = product.description;
+              document.getElementById('modalProductPrice').textContent = product.prix;
+              document.getElementById('modalProductQuantity').textContent = product.quantite;
+              
+              const modalAddToCart = document.getElementById('modalAddToCart');
+              modalAddToCart.dataset.productId = product.id;
+              modalAddToCart.dataset.productName = product.nom;
+              modalAddToCart.dataset.productPrice = product.prix;
+              
+              modal.style.display = 'block';
+            }
+          })
+          .catch(error => console.error('Erreur:', error));
       });
     });
 
     document.querySelector('.modal-close').addEventListener('click', function() {
       document.getElementById('imageModal').style.display = 'none';
+    });
+
+    // Fermer la modal si on clique en dehors
+    window.addEventListener('click', function(event) {
+      const modal = document.getElementById('imageModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
     });
   </script>
 </body>
