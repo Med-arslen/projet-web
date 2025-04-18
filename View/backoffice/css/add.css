@@ -1,0 +1,77 @@
+/* General body styling */
+body {
+  background-color: #f5f5f5;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar */
+.navbar {
+  background-color: rgba(94, 6, 6, 0.85) !important;
+  color: #fff;
+  font-weight: bold;
+}
+.input-error {
+  border-color: red;
+}
+.error-message {
+  font-size: 0.9rem;
+}
+
+/* Headings */
+h3 {
+  color: #800000;
+}
+
+.text-muted {
+  color: #a52a2a !important;
+}
+
+/* Form container */
+form {
+  background-color: #fff0f0;
+  border: 1px solid #d3a5a5;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(128, 0, 0, 0.2);
+}
+
+/* Labels */
+label {
+  color: #5e0606;
+  font-weight: 600;
+}
+
+/* Input fields and textarea */
+input.form-control,
+textarea.form-control {
+  border: 1px solid #800000;
+  border-radius: 5px;
+  padding: 8px;
+}
+
+input.form-control:focus,
+textarea.form-control:focus {
+  border-color: #5e0606;
+  box-shadow: 0 0 5px rgba(94, 6, 6, 0.5);
+}
+
+/* Buttons */
+.btn-success {
+  background-color: #800000;
+  border-color: #800000;
+}
+
+.btn-success:hover {
+  background-color: #5e0606;
+  border-color: #5e0606;
+}
+
+.btn-danger {
+  background-color: #b22222;
+  border-color: #b22222;
+}
+
+.btn-danger:hover {
+  background-color: #8b0000;
+  border-color: #8b0000;
+}
