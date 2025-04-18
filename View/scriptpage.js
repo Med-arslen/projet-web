@@ -261,4 +261,38 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('checkout-button').addEventListener('click', () => {
         window.location.href = 'addCommande.php';
     });
+
+    // Gestion des notifications
+    const notificationIcon = document.getElementById('notification-icon');
+    const notificationModal = document.getElementById('notification-modal');
+    const closeNotification = document.getElementById('close-notification');
+    const notificationCount = document.getElementById('notification-count');
+
+    // Mettre à jour le nombre de notifications
+    function updateNotificationCount() {
+        const notificationItems = document.querySelectorAll('.notification-item');
+        notificationCount.textContent = notificationItems.length;
+    }
+
+    // Ouvrir/fermer le modal des notifications
+    notificationIcon.addEventListener('click', function(e) {
+        e.preventDefault();
+        notificationModal.classList.toggle('hidden');
+    });
+
+    closeNotification.addEventListener('click', function() {
+        notificationModal.classList.add('hidden');
+    });
+
+    // Fermer le modal si on clique en dehors
+    window.addEventListener('click', function(e) {
+        if (!notificationModal.classList.contains('hidden') && 
+            !notificationModal.contains(e.target) && 
+            !notificationIcon.contains(e.target)) {
+            notificationModal.classList.add('hidden');
+        }
+    });
+
+    // Initialiser le compteur de notifications
+    updateNotificationCount();
 });

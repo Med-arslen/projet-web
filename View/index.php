@@ -55,7 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>MovieVibe</h2>
       </div>
       <nav class="menu">
-        <a data-attr="produits" class="active"><i class="fas fa-box"></i> Produits et Commandes</a>
+        <a href="#" data-tab="produits" class="tab-button active"><i class="fas fa-box"></i> Produits</a>
+        <a href="#" data-tab="commandes" class="tab-button"><i class="fas fa-shopping-cart"></i> Commandes</a>
       </nav>
       <div class="sidebar-footer">
         <button id="quitBtn" class="quit-button" onclick="window.location.href='../View/page.php';">
@@ -76,36 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h1>Gestion des Produits</h1>
             <p class="subtitle">Vue d'ensemble de votre catalogue</p>
           </div>
-        </div>
-        <form name="produitForm" method="POST" enctype="multipart/form-data">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="nom">Nom du produit</label>
-              <input type="text" name="nom" id="nom" required>
-            </div>
-            <div class="form-group">
-              <label for="description">Description</label>
-              <textarea name="description" id="description" required></textarea>
-            </div>
-            <div class="form-group">
-              <label for="prix">Prix</label>
-              <input type="number" name="prix" id="prix" step="0.01" required>
-            </div>
-            <div class="form-group">
-              <label for="quantite">Quantité</label>
-              <input type="number" name="quantite" id="quantite" required>
-            </div>
-            <div class="form-group">
-              <label for="image">Image</label>
-              <input type="file" name="image" id="image">
-            </div>
-          </div>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-save"></i> Enregistrer
-            </button>
+            <a href="ajouterproduit.php" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Ajouter un produit
+            </a>
           </div>
-        </form>
+        </div>
 
         <!-- Produits Table -->
         <div class="table-container">
@@ -189,6 +166,153 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById(button.dataset.tab).classList.add('active');
           });
         });
+
+        // Fonction de validation du formulaire
+        function validateForm() {
+            const nom = document.getElementById('nom').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const prix = parseFloat(document.getElementById('prix').value);
+            const quantite = parseInt(document.getElementById('quantite').value);
+            const image = document.getElementById('image').value;
+            let isValid = true;
+
+            // Réinitialiser tous les messages d'erreur
+            document.querySelectorAll('.warning-message').forEach(div => {
+                div.style.display = 'none';
+                div.textContent = '';
+            });
+
+            // Validation du nom
+            if (nom.length < 3) {
+                document.getElementById('nom-warning').textContent = 'Le nom du produit doit contenir au moins 3 caractères.';
+                document.getElementById('nom-warning').style.display = 'block';
+                isValid = false;
+            } else if (nom.length > 50) {
+                document.getElementById('nom-warning').textContent = 'Le nom du produit ne doit pas dépasser 50 caractères.';
+                document.getElementById('nom-warning').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validation de la description
+            if (description.length < 10) {
+                document.getElementById('description-warning').textContent = 'La description doit contenir au moins 10 caractères.';
+                document.getElementById('description-warning').style.display = 'block';
+                isValid = false;
+            } else if (description.length > 255) {
+                document.getElementById('description-warning').textContent = 'La description ne doit pas dépasser 255 caractères.';
+                document.getElementById('description-warning').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validation du prix
+            if (isNaN(prix) || prix <= 0) {
+                document.getElementById('prix-warning').textContent = 'Le prix doit être un nombre positif.';
+                document.getElementById('prix-warning').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validation de la quantité
+            if (isNaN(quantite) || quantite < 0) {
+                document.getElementById('quantite-warning').textContent = 'La quantité doit être un nombre positif ou nul.';
+                document.getElementById('quantite-warning').style.display = 'block';
+                isValid = false;
+            }
+
+            // Validation de l'image
+            if (!image) {
+                document.getElementById('image-warning').textContent = 'Veuillez sélectionner une image pour le produit.';
+                document.getElementById('image-warning').style.display = 'block';
+                isValid = false;
+            } else {
+                const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+                if (!allowedExtensions.exec(image)) {
+                    document.getElementById('image-warning').textContent = 'Format d\'image invalide. Seuls les formats JPG, JPEG, PNG, GIF et WEBP sont acceptés.';
+                    document.getElementById('image-warning').style.display = 'block';
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        // Écouteurs d'événements pour validation en temps réel
+        document.getElementById('nom').addEventListener('input', () => {
+            validateField('nom');
+        });
+        document.getElementById('description').addEventListener('input', () => {
+            validateField('description');
+        });
+        document.getElementById('prix').addEventListener('input', () => {
+            validateField('prix');
+        });
+        document.getElementById('quantite').addEventListener('input', () => {
+            validateField('quantite');
+        });
+        document.getElementById('image').addEventListener('change', () => {
+            validateField('image');
+        });
+
+        // Fonction pour valider un champ spécifique
+        function validateField(fieldName) {
+            const field = document.getElementById(fieldName);
+            const warning = document.getElementById(`${fieldName}-warning`);
+            let isValid = true;
+            let message = '';
+
+            switch(fieldName) {
+                case 'nom':
+                    const nom = field.value.trim();
+                    if (nom.length < 3) {
+                        message = 'Le nom du produit doit contenir au moins 3 caractères.';
+                        isValid = false;
+                    } else if (nom.length > 50) {
+                        message = 'Le nom du produit ne doit pas dépasser 50 caractères.';
+                        isValid = false;
+                    }
+                    break;
+
+                case 'description':
+                    const description = field.value.trim();
+                    if (description.length < 10) {
+                        message = 'La description doit contenir au moins 10 caractères.';
+                        isValid = false;
+                    } else if (description.length > 255) {
+                        message = 'La description ne doit pas dépasser 255 caractères.';
+                        isValid = false;
+                    }
+                    break;
+
+                case 'prix':
+                    const prix = parseFloat(field.value);
+                    if (isNaN(prix) || prix <= 0) {
+                        message = 'Le prix doit être un nombre positif.';
+                        isValid = false;
+                    }
+                    break;
+
+                case 'quantite':
+                    const quantite = parseInt(field.value);
+                    if (isNaN(quantite) || quantite < 0) {
+                        message = 'La quantité doit être un nombre positif ou nul.';
+                        isValid = false;
+                    }
+                    break;
+
+                case 'image':
+                    const image = field.value;
+                    if (image) {
+                        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.webp)$/i;
+                        if (!allowedExtensions.exec(image)) {
+                            message = 'Format d\'image invalide. Seuls les formats JPG, JPEG, PNG, GIF et WEBP sont acceptés.';
+                            isValid = false;
+                        }
+                    }
+                    break;
+            }
+
+            warning.textContent = message;
+            warning.style.display = isValid ? 'none' : 'block';
+        }
       </script>
     </main>
   </div>

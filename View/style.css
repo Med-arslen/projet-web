@@ -253,6 +253,28 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* Supprimer les messages de validation par défaut du navigateur */
+input:invalid {
+    box-shadow: none;
+}
+
+input:required {
+    box-shadow: none;
+}
+
+input::-webkit-validation-bubble-message,
+input::-o-validation-bubble-message,
+input::-ms-validation-bubble-message {
+    display: none;
+}
+
+/* Personnaliser l'apparence des champs invalides */
+input:invalid:not(:focus):not(:placeholder-shown),
+textarea:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: #e50914;
+    background-color: rgba(229, 9, 20, 0.05);
+}
+
 /* Table Styles */
 .table-container {
     background: rgba(0, 0, 0, 0.7);
@@ -1014,4 +1036,136 @@ footer {
 .cart-footer .btn-secondary {
     background-color: #333; /* Dark gray button */
     color: #fff; /* White text */
+}
+
+/* Tab Content Styles */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-button {
+    display: block;
+    padding: 15px;
+    color: #ffffff;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+.tab-button:hover {
+    background-color: rgba(229, 9, 20, 0.2);
+}
+
+.tab-button.active {
+    background-color: #e50914;
+    color: white;
+}
+
+.tab-button i {
+    margin-right: 10px;
+}
+
+/* Notification Icon and Modal Styles */
+.notification-menu {
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #e50914;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.notification-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    background-color: #000;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1000;
+}
+
+.notification-modal.hidden {
+    display: none;
+}
+
+.notification-header {
+    background-color: #e50914;
+    color: #fff;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.notification-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.notification-header button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.notification-items {
+    padding: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.notification-item p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.notification-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-items::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.notification-items::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.notification-items::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }

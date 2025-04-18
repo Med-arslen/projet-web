@@ -52,6 +52,10 @@
         <a href="#reclamations">Réclamation</a>
       </nav>
       <nav class="sub-nav">
+        <a href="#" id="notification-icon" class="notification-menu">
+          <i class="fas fa-bell"></i>
+          <span id="notification-count" class="notification-badge">0</span>
+        </a>
         <a href="#" id="cart-icon" class="cart-menu">
           <i class="fas fa-shopping-cart"></i>
           <span id="cart-count">0</span>
@@ -63,6 +67,34 @@
         </a>
       </nav>      
     </header>
+
+    <!-- Notification Modal -->
+    <div id="notification-modal" class="notification-modal hidden">
+      <div class="notification-header">
+        <h2>Historique des Commandes</h2>
+        <button id="close-notification">&times;</button>
+      </div>
+      <div id="notification-items" class="notification-items">
+        <?php
+        include_once '../Controller/CommandeController.php';
+        $commandeController = new CommandeController($pdo);
+        $commandes = $commandeController->getAllCommandes();
+        
+        if (empty($commandes)) {
+            echo "<p>Aucune commande dans l'historique.</p>";
+        } else {
+            foreach ($commandes as $commande) {
+                echo "<div class='notification-item'>";
+                echo "<p><strong>Commande #" . htmlspecialchars($commande['id']) . "</strong></p>";
+                echo "<p>Produit: " . htmlspecialchars($commande['id_produit']) . "</p>";
+                echo "<p>Client: " . htmlspecialchars($commande['nom_client']) . "</p>";
+                echo "<p>Date: " . htmlspecialchars($commande['date_commande']) . "</p>";
+                echo "</div>";
+            }
+        }
+        ?>
+      </div>
+    </div>
 
     <!-- Cart Modal -->
     <div id="cart-modal" class="cart-modal hidden">

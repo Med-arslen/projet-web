@@ -39,17 +39,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function validerProduit(produit) {
-        if (!produit.nom || produit.nom.length > 100)
-            return "Le nom est requis et doit avoir moins de 100 caractères.";
-        if (!produit.description)
-            return "La description est requise.";
-        if (!produit.prix || produit.prix <= 0)
-            return "Le prix doit être supérieur à 0.";
-        if (!produit.quantite || produit.quantite < 0)
-            return "La quantité doit être un nombre positif.";
-
+        if (typeof produit.nom !== 'string' || produit.nom.trim() === '' || produit.nom.length > 100) {
+            return "Le nom est requis et doit être une chaîne de moins de 100 caractères.";
+        }
+    
+        if (typeof produit.description !== 'string' || produit.description.trim() === '') {
+            return "La description est requise et doit être une chaîne.";
+        }
+    
+        if (isNaN(produit.prix) || produit.prix <= 0) {
+            return "Le prix doit être un nombre positif.";
+        }
+    
+        if (!Number.isInteger(produit.quantite) || produit.quantite < 0) {
+            return "La quantité doit être un entier positif ou nul.";
+        }
+    
         return null;
     }
+    
 
     function envoyerRequete(action, produit) {
         const formData = new FormData();
