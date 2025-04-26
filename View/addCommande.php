@@ -5,15 +5,24 @@ include '../Controller/CommandeController.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom_client = $_POST['nom_client'] ?? '';
     $adresse = $_POST['adresse'] ?? '';
-    $cart = json_decode($_POST['cart'], true);
-
-    $controller = new CommandeController($pdo);
-
-    foreach ($cart as $item) {
-        $controller->createCommande($item['id'], $nom_client, $adresse, $item['quantity']);
+    $cart = $_POST['cart'] ?? '[]';
+    
+    // Calculer le montant total
+    $cartData = json_decode($cart, true);
+    $total = 0;
+    foreach ($cartData as $item) {
+        $total += $item['price'] * $item['quantity'];
     }
+    
+    // Stocker les informations dans la session
+    session_start();
+    $_SESSION['cart'] = $cart;
+    $_SESSION['total'] = $total;
+    $_SESSION['nom_client'] = $nom_client;
+    $_SESSION['adresse'] = $adresse;
 
-    header('Location: page.php');
+    // Rediriger vers la page de paiement
+    header('Location: payement.php');
     exit;
 }
 
@@ -50,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
               <label for="map">Emplacement</label>
               <div id="map" style="height: 400px; width: 100%;"></div>
-              <p id="address" style="margin-top: 10px; font-weight: bold;"></p>
               <input type="hidden" name="latitude" id="latitude">
               <input type="hidden" name="longitude" id="longitude">
             </div>
@@ -105,9 +113,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       document.getElementById('latitude').value = lat;
       document.getElementById('longitude').value = lng;
 
-      // Fetch and display the address
+      // Fetch and update the address in the textarea
       const address = await getAddress(lat, lng);
-      document.getElementById('address').textContent = address;
+      document.getElementById('adresse').value = address;
     });
   </script>
 </body>

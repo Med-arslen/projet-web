@@ -8,12 +8,11 @@ class ProduitController {
     public function __construct($pdo) {
         $this->pdo = $pdo;
     }
-
+    
     // Create
     public function createProduit($nom, $description, $prix, $quantite, $image) {
         // Générer un ID aléatoire unique
-        $id_produit = uniqid();
-
+        $id_produit = rand(0, 100);
         $stmt = $this->pdo->prepare("INSERT INTO produit (id_produit, nom, description, prix, quantite, image) VALUES (?, ?, ?, ?, ?, ?)");
         return $stmt->execute([$id_produit, $nom, $description, $prix, $quantite, $image]);
     }

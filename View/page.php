@@ -148,7 +148,7 @@
           <i class="fas fa-bell"></i>
           <span id="notification-count" class="notification-badge">0</span>
         </a>
-        <a href="#" id="cart-icon" class="cart-menu">
+        <a href="panier.php" class="cart-menu">
           <i class="fas fa-shopping-cart"></i>
           <span id="cart-count">0</span>
         </a>
@@ -185,20 +185,6 @@
             }
         }
         ?>
-      </div>
-    </div>
-
-    <!-- Cart Modal -->
-    <div id="cart-modal" class="cart-modal hidden">
-      <div class="cart-header">
-        <h2>Votre Panier</h2>
-        <button id="close-cart">&times;</button>
-      </div>
-      <div id="cart-items" class="cart-items">
-        <p>Votre panier est vide.</p>
-      </div>
-      <div class="cart-footer">
-        <button id="checkout-button" class="btn btn-primary">Confirmer la commande</button>
       </div>
     </div>
 

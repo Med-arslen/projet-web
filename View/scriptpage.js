@@ -220,40 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
         cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
     }
 
-    // Render cart items in modal
-    function renderCartItems() {
-        const cartItemsContainer = document.getElementById('cart-items');
-        cartItemsContainer.innerHTML = '';
-
-        if (cart.length === 0) {
-            cartItemsContainer.innerHTML = '<p>Votre panier est vide.</p>';
-            return;
-        }
-
-        cart.forEach(item => {
-            const cartItem = document.createElement('div');
-            cartItem.classList.add('cart-item');
-            cartItem.innerHTML = `
-                <p>${item.name} (x${item.quantity}) - ${item.price.toFixed(2)} €</p>
-            `;
-            cartItemsContainer.appendChild(cartItem);
-        });
-    }
-
-    // Show cart modal
-    const cartIcon = document.getElementById('cart-icon');
-    const cartModal = document.getElementById('cart-modal');
-    const closeCartButton = document.getElementById('close-cart');
-
-    cartIcon.addEventListener('click', () => {
-        renderCartItems();
-        cartModal.style.display = 'flex';
-    });
-
-    closeCartButton.addEventListener('click', () => {
-        cartModal.style.display = 'none';
-    });
-
     // Initialize cart count on page load
     updateCartCount();
 
