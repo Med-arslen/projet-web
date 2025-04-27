@@ -12,7 +12,7 @@ if (!isset($_SESSION['total'])) {
 }
 
 // Configurer la clé API Stripe
-\Stripe\Stripe::setApiKey('');
+\Stripe\Stripe::setApiKey('sk_test_51RHl9bFR5WWKGtO9XG6pNMQdrn5rgWaYwtJbLysl8bxz5sD9baMKPVNG45pAw6jDgGNMVzGGYjaPJgrIpXwiSrVZ00g9PUFlf8');
 
 // Vérifier si on a un payment_intent_id (retour après paiement)
 if (isset($_GET['payment_intent'])) {
@@ -165,7 +165,7 @@ try {
     </div>
 
     <script>
-        const stripe = Stripe('');
+        const stripe = Stripe('pk_test_51RHl9bFR5WWKGtO9FfhqMdx9tisZRhYjPpDEaysHba0YWyOvAZIbwZKOpT2dUZMR0kii31s4GzQEsmFSAcywE4uH00inBdw3HO');
         const elements = stripe.elements();
         const card = elements.create('card', {
             style: {
