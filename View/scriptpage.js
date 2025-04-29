@@ -184,3 +184,32 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// Add to your scriptpage.js
+function toggleDetails(filmId) {
+    const details = document.getElementById(`details-${filmId}`);
+    const allDetails = document.querySelectorAll('.movie-details');
+    
+    // Hide all other details first
+    allDetails.forEach(detail => {
+        if (detail.id !== `details-${filmId}`) {
+            detail.style.display = 'none';
+        }
+    });
+    
+    // Toggle the clicked details
+    if (details.style.display === 'block') {
+        details.style.display = 'none';
+    } else {
+        details.style.display = 'block';
+    }
+}
+
+// Close details when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.movie-card')) {
+        document.querySelectorAll('.movie-details').forEach(detail => {
+            detail.style.display = 'none';
+        });
+    }
+});
