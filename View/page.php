@@ -52,15 +52,12 @@ $films = $filmController->getAllFilms();
         <div class="movies-grid">
             <?php foreach ($films as $film): ?>
                 <div class="movie-card">
-                    <div class="movie-image">
+                    <div class="movie-image" onclick="showCommentForm(<?= $film->getId() ?>)">
                         <img src="<?= $film->getPhoto() ? '../uploads/' . htmlspecialchars($film->getPhoto()) : 'default-movie.jpg' ?>" 
                              alt="<?= htmlspecialchars($film->getTitre()) ?>">
                         <div class="movie-overlay">
                             <div class="movie-actions">
-                                <button class="play-btn"><i class="fas fa-play"></i></button>
-                                <button class="info-btn" onclick="toggleDetails(<?= $film->getId() ?>)">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
+                                <i class="fas fa-comment"></i>
                             </div>
                         </div>
                     </div>
@@ -69,22 +66,18 @@ $films = $filmController->getAllFilms();
                             <h3><?= htmlspecialchars($film->getTitre()) ?></h3>
                             <span class="rating"><?= htmlspecialchars($film->getAgeRecommande()) ?>+</span>
                         </div>
-                        <div class="movie-meta">
-                            <span class="year"><?= htmlspecialchars($film->getAnneeSortie()) ?></span>
-                            <span class="duration"><?= htmlspecialchars($film->getDuree()) ?> min</span>
-                            <span class="genre"><?= htmlspecialchars($film->getGenre()) ?></span>
-                        </div>
                     </div>
                     
-                    <!-- Movie Details and Comment Form -->
-                    <div id="details-<?= $film->getId() ?>" class="movie-details">
-                        <div class="details-content">
-                            <h4>Ajouter un commentaire</h4>
+                    <!-- Comment Popup Form -->
+                    <div id="comment-form-<?= $film->getId() ?>" class="comment-popup">
+                        <div class="comment-popup-content">
+                            <span class="close-popup" onclick="closeCommentForm(<?= $film->getId() ?>)">&times;</span>
+                            <h4><?= htmlspecialchars($film->getTitre()) ?></h4>
                             <form method="post" action="commentairegestion.php" class="comment-form">
                                 <input type="hidden" name="id_film" value="<?= $film->getId() ?>">
                                 <input type="text" name="auteur" placeholder="👤 Votre nom" required>
                                 <input type="text" name="contenu" placeholder="✍️ Votre avis..." required>
-                                <input type="number" name="note" placeholder="⭐ Note (1 à 10)" min="0" max="10" required>
+                                <input type="number" name="note" placeholder="⭐ Note (1 à 10)" min="1" max="10" required>
                                 <button type="submit"><i class="fas fa-paper-plane"></i> Envoyer</button>
                             </form>
                         </div>
