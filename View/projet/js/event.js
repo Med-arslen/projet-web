@@ -111,10 +111,14 @@ function showReservationForm(eventData) {
    
     document.getElementById("reservationForm").dataset.basePrice = eventData.price_event;
     document.getElementById("reservationForm").dataset.totalPlaces = eventData.total_places;
+    document.getElementById("reservationForm").dataset.user_id=eventData.id_client;
+
   
   
     document.getElementById("people").value = 1;
     document.getElementById("errorMessage").style.display = "none";
+
+    
   }
   
   function closeReservationForm() {
@@ -122,11 +126,14 @@ function showReservationForm(eventData) {
   }
   
   function updatePrice() {
+    window.addEventListener('DOMContentLoaded', updatePrice);
+
     const basePrice = parseFloat(document.getElementById("reservationForm").dataset.basePrice || 0);
     const nb_place=parseInt(document.getElementById("reservationForm").dataset.totalPlaces || 1);
     const people = parseInt(document.getElementById("people").value || 1);
     const total = basePrice * people;
     document.getElementById("price").textContent = total.toFixed(2);
+    document.getElementById("price_input").value = total.toFixed(2);
     const input_place=document.getElementById("people");
     input_place.setAttribute('max',nb_place+1);
     if(nb_place<people){
@@ -154,5 +161,14 @@ function showReservationForm(eventData) {
     }
      
   }
+
+
+  
+
+
+ 
+
+
+
 
 

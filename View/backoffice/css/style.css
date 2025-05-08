@@ -39,6 +39,7 @@ body::before {
 
 .logo h2 {
   font-size: 20px;
+  margin: 0;
 }
 
 .menu a {
@@ -50,6 +51,7 @@ body::before {
   color: #fff;
   border-radius: 8px;
   transition: 0.3s;
+  cursor: pointer;
 }
 
 .menu a i {
@@ -261,4 +263,4 @@ tbody tr:hover {
 
 
 
-  
+

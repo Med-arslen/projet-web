@@ -1,0 +1,19 @@
+{
+    "name": "vendor/filmprjt",
+    "require": {
+        "dompdf/dompdf": "^3.1",
+        "setasign/fpdf": "*",
+        "stripe/stripe-php": "^17.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vendor\\Filmprjt\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "miraboukhris",
+            "email": "mira.boukhris@esprit.tn"
+        }
+    ]
+}
