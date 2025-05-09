@@ -1,3 +1,5 @@
+// Script principal pour la gestion des réclamations
+
 // Activation du menu + animation + détection automatique
 document.addEventListener("DOMContentLoaded", () => {
   const menuLinks = document.querySelectorAll(".menu a");
@@ -104,4 +106,59 @@ if (quitBtn) {
       window.close(); // Peut ne pas fonctionner selon navigateur
     }
   });
+}
+
+// Initialisation et gestion du QR code
+let qrModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+    console.log('Modal QR code initialisé');
+});
+
+async function showQRCode(id) {
+    try {
+        if (!qrModal) {
+            qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+        }
+        
+        const qrContainer = document.getElementById('qrCodeContainer');
+        const qrError = document.getElementById('qrError');
+        
+        // Afficher le modal avec le spinner
+        qrModal.show();
+        qrContainer.innerHTML = `
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+            </div>
+        `;
+        qrError.style.display = 'none';
+
+        // Faire la requête
+        const response = await fetch(`index.php?qrcode_id=${id}`);
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.error || 'Erreur lors de la génération du QR code');
+        }
+
+        // Afficher uniquement le QR code
+        qrContainer.innerHTML = `
+            <div class="text-center">
+                <img src="${data.qr_url}" alt="QR Code" class="img-fluid" style="max-width: 300px;">
+                <p class="mt-3 text-muted">Scannez ce QR code pour voir les détails de la réclamation</p>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Erreur:', error);
+        const qrError = document.getElementById('qrError');
+        qrError.textContent = `Erreur: ${error.message}`;
+        qrError.style.display = 'block';
+        qrContainer.innerHTML = '';
+    }
 }

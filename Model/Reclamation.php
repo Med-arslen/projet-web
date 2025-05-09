@@ -8,6 +8,7 @@ class Reclamation
     private $nomfilm;
     private $type_rec;
     private $detail;
+    private $reponse_rec;
 
     // Constructeur
     public function __construct($nomprenom, $email, $nomfilm, $type_rec, $detail,$reponse_rec ,$id_rec = null)

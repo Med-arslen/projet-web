@@ -42,9 +42,10 @@ if (isset($_POST["submit"])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Reclamation</title>
+    <title>Ajouter Reclamation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../backoffice/css/style.css"/>
+    <link rel="icon" href="../backoffice/assests/img/logo.png" type="image/png">
     
     
    
@@ -80,7 +81,7 @@ if (isset($_POST["submit"])) {
 <nav class="navbar navbar-expand-lg mb-5 shadow-lg rounded-3" style="background: #8B0000; border-bottom: 4px solid #d3a5a5;">
     <div class="container justify-content-center">
         <span class="navbar-brand mb-0 h1 text-white fw-bold" style="font-family: 'Poppins', sans-serif; font-size: 3rem;">
-            🎬 Add New Reclamation
+            🎬 Ajouter Votre Réclamation
         </span>
     </div>
 </nav>
@@ -89,7 +90,7 @@ if (isset($_POST["submit"])) {
 <div class="container">
     <div class="text-center mb-4">
         <p class="fs-2 fw-light" style="color: #ffd700; background: linear-gradient(to right, #f4a261, #e76f51); -webkit-background-clip: text; color: transparent; font-family: 'Roboto', sans-serif; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
-            Fill in the details below
+            Ecrivez-nous votre problème
         </p>
         <div style="width: 60px; height: 3px; background-color: #f4a261; margin: 10px auto;"></div>
     </div>

@@ -1,129 +1,155 @@
 body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: url('../assets/img/cinema.jpg') no-repeat center center fixed;
-  background-size: cover;
+    font-family: 'Poppins', sans-serif;
+    background: url('assets/img/cinema.jpg') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
 }
 
-.table-wrapper {
-  margin: 50px auto;
-  padding: 30px;
-  max-width: 95%;
-  width: 1200px;
-  background-color: #f9f9f9; /* blanc cassé */
-  color: #111; /* noir foncé */
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}
-
-h2 {
-  margin-bottom: 30px;
-  color: #111;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: transparent;
-}
-
-table th, table td {
-  padding: 12px 15px;
-  border: 1px solid #ccc;
-}
-
-table th {
-  background-color: #eaeaea;
-  font-weight: bold;
-  color: #111;
-}
-
-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-#descButton {
-  margin-bottom: 20px;
-  padding: 10px 20px;
-  background-color: #8B0000;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-#descButton:hover {
-  background-color: #a60000;
-}
 .wrapper {
-  display: flex;
-  min-height: 100vh;
+    display: flex;
+    min-height: 100vh;
 }
 
-/* Sidebar */
+/* Sidebar Styles */
 .sidebar {
-  width: 250px;
-  background-color: #222;
-  color: white;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
+    width: 250px;
+    background-color: #222;
+    padding: 20px;
+    position: fixed;
+    height: 100vh;
+    color: white;
 }
 
 .sidebar .logo {
-  text-align: center;
-  margin-bottom: 30px;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 .sidebar .logo img {
-  max-width: 100px;
+    max-width: 100px;
 }
 
-.sidebar h2 {
-  font-size: 1.5rem;
-  margin-top: 10px;
+.sidebar .logo h2 {
+    margin-top: 10px;
+    font-size: 1.5rem;
 }
 
-.sidebar .menu a {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 12px 15px;
-  border-radius: 8px;
-  margin: 5px 0;
-  transition: background-color 0.3s ease;
+.menu a {
+    display: block;
+    padding: 12px 15px;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    margin: 5px 0;
+    transition: background-color 0.3s;
 }
 
-.sidebar .menu a:hover,
-.sidebar .menu a.active {
-  background-color: #8B0000;
+.menu a:hover,
+.menu a.active {
+    background-color: #8B0000;
 }
 
-/* Sous-menu */
+.menu i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
 .submenu {
-  padding-left: 20px;
+    margin-left: 20px;
+    display: none;
 }
 
-.submenu a {
-  font-size: 0.9rem;
+#quitBtn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    text-align: left;
+    border-radius: 8px;
+    transition: background-color 0.3s;
 }
 
-/* Main content - décale pour laisser la sidebar visible */
-.container {
-  margin-left: 270px; /* Largeur sidebar + marge */
-  padding: 40px 20px;
-  flex-grow: 1;
+#quitBtn:hover {
+    background-color: #8B0000;
 }
 
-/* Navbar ajustée */
+/* Main Content Styles */
+.content-wrapper {
+    margin-left: 250px;
+    flex: 1;
+    padding: 20px;
+}
+
 .navbar {
-  margin-left: 270px;
-  z-index: 1;
+    background: #8B0000 !important;
+    border-bottom: 4px solid #d3a5a5 !important;
+}
+
+.navbar-brand {
+    color: white !important;
+    font-size: 2.5rem !important;
+}
+
+/* Table Container Styles */
+.table-container {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #8B0000;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    vertical-align: middle;
+    padding: 15px;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    padding: 12px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(139, 0, 0, 0.05);
+}
+
+/* Button Styles */
+#descButton {
+    background-color: #8B0000;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#descButton:hover {
+    background-color: #a60000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#descButton i {
+    margin-right: 8px;
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(to right, #f4a261, #e76f51);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-family: 'Roboto', sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }

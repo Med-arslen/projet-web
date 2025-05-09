@@ -9,6 +9,7 @@ $activePage = basename($_SERVER['PHP_SELF']);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="../backoffice/assets/img/logo.png" type="image/png">
   <title>Feedback - MovieVibe</title>
 
   <link rel="stylesheet" href="../backoffice/css/style.css"/>
@@ -94,6 +95,9 @@ $activePage = basename($_SERVER['PHP_SELF']);
             <div class="text-center mb-4">
               <a href="add_fed.php" class="btn btn-dark py-2 px-4">
                 <i class="fas fa-plus-circle me-2"></i> Ajouter Feedback
+              </a>
+              <a href="generate_pdf.php" class="btn btn-danger py-2 px-4 ms-2">
+                <i class="fas fa-file-pdf me-2"></i> Générer PDF
               </a>
             </div>
 
