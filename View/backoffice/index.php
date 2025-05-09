@@ -1,10 +1,12 @@
 <?php
 include 'C:\xampp\htdocs\crudweb\config.php';
 include 'C:\xampp\htdocs\crudweb\Controller\FilmController.php';
+include 'C:\xampp\htdocs\crudweb\Controller\CommentaireController.php'; // Add this line
 include 'C:\xampp\htdocs\crudweb\Controller\HistoriqueController.php';
 
 $controller = new FilmController($pdo);
 $historiqueController = new HistoriqueController($pdo);
+$commentController = new CommentaireController($pdo); // Ensure this is initialized
 $films = $controller->getAllFilms();
 $historique = $historiqueController->getRecentHistorique();
 ?>
@@ -51,8 +53,8 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
   <meta name="description" content="MovieVibe - Système de gestion de films"/>
   <meta name="theme-color" content="#141414"/>
   <title>Gestion des Films - MovieVibe</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="script.js"></script>
+  <link rel="stylesheet" href="../style.css"/>
+  <script src="../script.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 </head>
 <body>
@@ -60,11 +62,12 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="logo.png" alt="Logo MovieVibe" />
-        <h2>MovieVibe</h2>
+      <a id="logo" href="../frontoffice/page.php" ><img src="../logo.png" alt="MovieVibe Logo" id="logo1"></a>
+      <h3 style="color: var(--primary);">MovieVibe</h3>
       </div>
       <nav class="menu">
         <a data-attr="films" class="active"><i class="fas fa-film"></i> Films</a>
+        <a data-attr="commentaires" href="commentairegestion.php"><i class="fas fa-comment"></i> Commentaires</a>
         <a data-attr="event"><i class="fas fa-calendar"></i> Événement</a>
         <a data-attr="reclamation"><i class="fas fa-bell"></i> Réclamation</a>
         <a data-attr="produit"><i class="fas fa-shopping-cart"></i> Produit</a>
@@ -90,7 +93,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             <p class="subtitle">Vue d'ensemble de votre catalogue</p>
           </div>
           <div class="btn-group">
-           
+            <a href="chatbot.php" class="btn btn-primary"><i class="fas fa-robot"></i> Chatbot</a>
           </div>
         </div>
         <div class="search-zone">
@@ -174,6 +177,29 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     <a href="deletefilm.php?id=<?= $film->getId() ?>" class="btn-delete" onclick="return confirm('Supprimer ce film ?')">Supprimer</a>
   </td>
 </tr>
+<tr>
+  <td colspan="8">
+    <div class="comments-section">
+      <h4>Commentaires pour <?= htmlspecialchars($film->getTitre()) ?>:</h4>
+      <?php 
+        $comments = $commentController->getCommentairesByFilm($film->getId());
+        if (count($comments) > 0): 
+      ?>
+        <ul>
+          <?php foreach ($comments as $comment): ?>
+            <li>
+              <strong><?= htmlspecialchars($comment->getAuteur()) ?>:</strong> 
+              <?= htmlspecialchars($comment->getContenu()) ?> 
+              <em>(Note: <?= htmlspecialchars($comment->getNote()) ?>/10)</em>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php else: ?>
+        <p>Aucun commentaire pour ce film.</p>
+      <?php endif; ?>
+    </div>
+  </td>
+</tr>
 <?php endforeach; ?>
 
           </tbody>
@@ -227,5 +253,28 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
       </section>
     </main>
   </div>
+  <script>
+  document.getElementById('searchInput').addEventListener('input', function () {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#filmsTable tbody tr');
+
+    rows.forEach((row, index) => {
+      const titleCell = row.querySelector('td:nth-child(2)');
+      
+      // Check if the row is a film row (has a title cell)
+      if (titleCell) {
+        const title = titleCell.textContent.toLowerCase();
+        const shouldDisplay = title.includes(filter);
+        row.style.display = shouldDisplay ? '' : 'none';
+
+        // Hide the next row (comments row) if the film row is hidden
+        const nextRow = rows[index + 1];
+        if (nextRow && nextRow.querySelector('td[colspan="8"]')) {
+          nextRow.style.display = shouldDisplay ? '' : 'none';
+        }
+      }
+    });
+  });
+</script>
 </body>
 </html>

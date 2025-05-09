@@ -92,8 +92,8 @@ foreach ($films as $film) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestion des Commentaires - MovieVibe</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="commentairegestion.js"></script>
+  <link rel="stylesheet" href="../style.css"/>
+  <script src="../commentairegestion.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 </head>
 <body>
@@ -102,11 +102,12 @@ foreach ($films as $film) {
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">
-      <img src="logo.png" alt="Logo MovieVibe" />
-      <h2>MovieVibe</h2>
+    <a id="logo" href="../frontoffice/page.php" ><img src="../logo.png" alt="MovieVibe Logo" id="logo1"></a>
+      <h3 style="color: var(--primary);">MovieVibe</h3>
     </div>
     <nav class="menu">
-      <a class="active"><i class="fas fa-comment"></i> Commentaires</a>
+      <a data-attr="films" href="index.php"><i class="fas fa-film"></i> Films</a>
+      <a data-attr="commentaires" class="active"><i class="fas fa-comment"></i> Commentaires</a>
       <a><i class="fas fa-calendar"></i> Événement</a>
       <a><i class="fas fa-bell"></i> Réclamation</a>
       <a><i class="fas fa-shopping-cart"></i> Produit</a>
@@ -120,70 +121,7 @@ foreach ($films as $film) {
   <!-- MAIN CONTENT -->
   <main class="main-content">
     <section class="Commentaires-section">
-      <div class="content-header">
-        <h1>Gestion des Commentaires</h1>
-        <p class="subtitle">Ajoutez et visualisez les avis de films</p>
-      </div>
-
-      <?php if ($error): ?>
-        <p style="color: red;"><?= htmlspecialchars($error) ?></p>
-      <?php endif; ?>
-
-      <form method="POST" id="commentForm" novalidate>
-    <div class="form-grid">
-        <div class="form-group">
-            <label for="id_film">Film *</label>
-            <select name="id_film" id="id_film" class="<?= isset($errors['id_film']) ? 'error' : '' ?>">
-                <option value="">-- Choisir un film --</option>
-                <?php foreach ($films as $film): ?>
-                    <option value="<?= $film->getId() ?>" <?= (isset($_POST['id_film']) && $_POST['id_film'] == $film->getId()) ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($film->getTitre()) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <?php if (isset($errors['id_film'])): ?>
-                <span class="error-message"><?= $errors['id_film'] ?></span>
-            <?php endif; ?>
-        </div>
-
-        <div class="form-group">
-            <label for="auteur">Auteur *</label>
-            <input type="text" name="auteur" id="auteur" 
-                   value="<?= htmlspecialchars($_POST['auteur'] ?? '') ?>"
-                   class="<?= isset($errors['auteur']) ? 'error' : '' ?>">
-            <?php if (isset($errors['auteur'])): ?>
-                <span class="error-message"><?= $errors['auteur'] ?></span>
-            <?php endif; ?>
-        </div>
-
-        <div class="form-group">
-            <label for="contenu">Contenu *</label>
-            <textarea name="contenu" id="contenu" rows="3" 
-                      class="<?= isset($errors['contenu']) ? 'error' : '' ?>"
-            ><?= htmlspecialchars($_POST['contenu'] ?? '') ?></textarea>
-            <?php if (isset($errors['contenu'])): ?>
-                <span class="error-message"><?= $errors['contenu'] ?></span>
-            <?php endif; ?>
-        </div>
-
-        <div class="form-group">
-            <label for="note">Note * (0-10)</label>
-            <input type="number" name="note" id="note" min="0" max="10" 
-                   value="<?= htmlspecialchars($_POST['note'] ?? '') ?>"
-                   class="<?= isset($errors['note']) ? 'error' : '' ?>">
-            <?php if (isset($errors['note'])): ?>
-                <span class="error-message"><?= $errors['note'] ?></span>
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary" id="submitt">
-            <i class="fas fa-save"></i> Enregistrer
-        </button>
-    </div>
-</form>
-
+      
       <!-- Add this before the table-container div -->
 <div class="statistics-dashboard">
     <h2>Statistiques des Commentaires</h2>

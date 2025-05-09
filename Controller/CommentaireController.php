@@ -15,8 +15,8 @@ class CommentaireController {
         $stmt = $this->pdo->prepare("INSERT INTO commentaire (id_film, auteur, contenu, note, date_commentaire) VALUES (?, ?, ?, ?, ?)");
         return $stmt->execute([$id_film, $auteur, $contenu, $note, $date_commentaire]);
     }
-    
-    // Create
+
+// Create
     public function createCommentaires($id_film, $auteur, $contenu, $note, $date_commentaire) {
         $stmt = $this->pdo->prepare("INSERT INTO commentaire (id_film, auteur, contenu, note, date_commentaire) VALUES (?, ?, ?, ?, ?)");
         return $stmt->execute([$id_film, $auteur, $contenu, $note, $date_commentaire]);

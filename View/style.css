@@ -422,7 +422,7 @@ header.scrolled {
 }
 
 .movieVibeLogo {
-    padding-right: 20px;
+    padding-right: 10px;
 }
 
 #logo1 {
@@ -488,6 +488,10 @@ header.scrolled {
 }
 
 .location h2 i {
+    color: #e50914;
+}
+
+.h3 {
     color: #e50914;
 }
 

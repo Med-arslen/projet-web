@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
   <meta charset="UTF-8" />
   <title>Modifier Commentaire - MovieVibe</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
 <div class="wrapper">
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <section class="Commentaires-section">
       <div class="content-header">
         <h1>Modifier le Commentaire</h1>
-        <a href="commentairegestion.php" class="btn btn-secondary">← Retour</a>
+        <a href="../commentairegestion.php" class="btn btn-secondary">← Retour</a>
       </div>
 
       <?php if ($error): ?>
