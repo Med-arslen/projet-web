@@ -6,6 +6,7 @@ class Commande {
     private $adresse;
     private $date_commande;
     private $quantite;
+    private $produits = [];
 
     public function __construct($id_commande = null, $id_produit = null, $nom_client = null, $adresse = null, $date_commande = null, $quantite = null) {
         $this->id_commande = $id_commande;
@@ -23,6 +24,7 @@ class Commande {
     public function getAdresse() { return $this->adresse; }
     public function getDateCommande() { return $this->date_commande; }
     public function getQuantite() { return $this->quantite; }
+    public function getProduits() { return $this->produits; }
 
     // --- SETTERS ---
     public function setIdCommande($id) { $this->id_commande = $id; }
@@ -31,5 +33,8 @@ class Commande {
     public function setAdresse($adresse) { $this->adresse = $adresse; }
     public function setDateCommande($date) { $this->date_commande = $date; }
     public function setQuantite($quantite) { $this->quantite = $quantite; }
+    public function setProduits($produits) {
+        $this->produits = $produits;
+    }
 }
 ?>

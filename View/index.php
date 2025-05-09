@@ -3,11 +3,34 @@ include 'C:\xampp\htdocs\projetweb\config.php';
 include 'C:\xampp\htdocs\projetweb\Controller\ProduitController.php';
 include 'C:\xampp\htdocs\projetweb\Controller\CommandeController.php';
 
+
 $controller = new ProduitController($pdo);
 $produits = $controller->getAllProduits();
 
 $commandeController = new CommandeController($pdo);
 $commandes = $commandeController->getAllCommandes();
+
+$currentTab = isset($_GET['tab']) ? $_GET['tab'] : 'produits';
+
+// Pagination pour les produits
+$produitsParPage = 4;
+$nombreTotalProduits = count($produits);
+$nombrePages = ceil($nombreTotalProduits / $produitsParPage);
+$pageActuelle = isset($_GET['page']) ? max(1, min($nombrePages, intval($_GET['page']))) : 1;
+$indexDebut = ($pageActuelle - 1) * $produitsParPage;
+$produitsPage = array_slice($produits, $indexDebut, $produitsParPage);
+
+// Pagination pour les commandes
+$commandesParPage = 4;
+$nombreTotalCommandes = count($commandes);
+$nombrePagesCommandes = ceil($nombreTotalCommandes / $commandesParPage);
+$pageActuelleCommandes = isset($_GET['pageCommandes']) ? max(1, min($nombrePagesCommandes, intval($_GET['pageCommandes']))) : 1;
+$indexDebutCommandes = ($pageActuelleCommandes - 1) * $commandesParPage;
+$commandesPage = array_slice($commandes, $indexDebutCommandes, $commandesParPage);
+
+function buildPaginationUrl($page, $tab) {
+    return '?page=' . $page . '&tab=' . $tab;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom = $_POST['nom'] ?? '';
@@ -32,6 +55,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: index.php');
     exit;
 }
+
+// Créer un tableau JSON de toutes les commandes pour la carte
+$allCommandesForMap = array_map(function($commande) {
+    return [
+        'client' => $commande['nom_client'],
+        'adresse' => $commande['adresse'],
+        'produit' => $commande['id_produit'],
+        'quantite' => $commande['quantite'],
+        'date' => $commande['date_commande']
+    ];
+}, $commandes);
+
+// Convertir le tableau en JSON pour l'utiliser dans JavaScript
+$commandesJson = json_encode($allCommandesForMap);
+
+// Préparer les données pour les statistiques
+$allStatsData = array_map(function($commande) {
+    return [
+        'id_produit' => $commande['id_produit'],
+        'nom_client' => $commande['nom_client'],
+        'quantite' => $commande['quantite']
+    ];
+}, $commandes);
+
+// Convertir en JSON pour l'utiliser dans JavaScript
+$statsJson = json_encode($allStatsData);
 ?>
 
 <!DOCTYPE html>
@@ -56,8 +105,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>MovieVibe</h2>
       </div>
       <nav class="menu">
-        <a href="#" data-tab="produits" class="tab-button active"><i class="fas fa-box"></i> Produits</a>
-        <a href="#" data-tab="commandes" class="tab-button"><i class="fas fa-shopping-cart"></i> Commandes</a>
+        <a href="<?= buildPaginationUrl(1, 'produits', $pageActuelle, $pageActuelleCommandes) ?>" 
+           data-tab="produits" 
+           class="tab-button <?= $currentTab === 'produits' ? 'active' : '' ?>">
+            <i class="fas fa-box"></i> Produits
+        </a>
+        <a href="<?= buildPaginationUrl(1, 'commandes', $pageActuelleCommandes, $pageActuelle) ?>" 
+           data-tab="commandes" 
+           class="tab-button <?= $currentTab === 'commandes' ? 'active' : '' ?>">
+            <i class="fas fa-shopping-cart"></i> Commandes
+        </a>
       </nav>
       <div class="sidebar-footer">
         <button id="quitBtn" class="quit-button" onclick="window.location.href='../View/page.php';">
@@ -72,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <header class="top-bar"></header>
 
       <!-- Section Produits -->
-      <section class="tab-content active" id="produits">
+      <section class="tab-content <?= $currentTab === 'produits' ? 'active' : '' ?>" id="produits">
         <div class="content-header">
           <div class="title-section">
             <h1>Gestion des Produits</h1>
@@ -118,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </tr>
             </thead>
             <tbody>
-              <?php foreach ($produits as $produit): ?>
+              <?php foreach ($produitsPage as $produit): ?>
               <tr>
                 <td><?= htmlspecialchars($produit->getId()) ?></td>
                 <td><?= htmlspecialchars($produit->getNom()) ?></td>
@@ -127,22 +184,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <td><?= htmlspecialchars($produit->getQuantite()) ?></td>
                 <td><img src="../uploads/<?= htmlspecialchars($produit->getImage()) ?>" alt="Image du produit" width="50"></td>
                 <td>
-                  <a href="updateproduit.php?id=<?= $produit->getId() ?>" class="btn-edit">Modifier</a>
-                  <a href="deleteproduit.php?id=<?= $produit->getId() ?>" class="btn-delete" onclick="return confirm('Supprimer ce produit ?')">Supprimer</a>
+                  <a href="updateproduit.php?id=<?= $produit->getId() ?>" class="btn-icon btn-edit" title="Modifier">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a href="deleteproduit.php?id=<?= $produit->getId() ?>" class="btn-icon btn-delete" onclick="return confirm('Supprimer ce produit ?')" title="Supprimer">
+                    <i class="fas fa-trash"></i>
+                  </a>
                 </td>
               </tr>
               <?php endforeach; ?>
             </tbody>
           </table>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <?php if ($nombrePages > 1): ?>
+              <?php if ($pageActuelle > 1): ?>
+                <a href="<?= buildPaginationUrl($pageActuelle - 1, 'produits') ?>" class="pagination-btn">&laquo; Précédent</a>
+              <?php endif; ?>
+
+              <?php for ($i = 1; $i <= $nombrePages; $i++): ?>
+                <a href="<?= buildPaginationUrl($i, 'produits') ?>" class="pagination-btn <?= $i === $pageActuelle ? 'active' : '' ?>">
+                  <?= $i ?>
+                </a>
+              <?php endfor; ?>
+
+              <?php if ($pageActuelle < $nombrePages): ?>
+                <a href="<?= buildPaginationUrl($pageActuelle + 1, 'produits') ?>" class="pagination-btn">Suivant &raquo;</a>
+              <?php endif; ?>
+            <?php endif; ?>
+          </div>
         </div>
       </section>
 
       <!-- Section Commandes -->
-      <section class="tab-content" id="commandes">
+      <section class="tab-content <?= $currentTab === 'commandes' ? 'active' : '' ?>" id="commandes">
         <div class="content-header">
           <div class="title-section">
             <h1>Gestion des Commandes</h1>
             <p class="subtitle">Vue d'ensemble des commandes</p>
+          </div>
+          <div class="form-actions">
+            <a href="facture.php" class="btn btn-primary">
+              <i class="fas fa-file-invoice"></i> Voir la dernière facture
+            </a>
           </div>
         </div>
 
@@ -178,7 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </tr>
             </thead>
             <tbody>
-              <?php foreach ($commandes as $commande): ?>
+              <?php foreach ($commandesPage as $commande): ?>
               <tr>
                 <td><?= htmlspecialchars($commande['id']) ?></td>
                 <td><?= htmlspecialchars($commande['id_produit']) ?></td>
@@ -190,6 +275,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <?php endforeach; ?>
             </tbody>
           </table>
+
+          <!-- Pagination pour les commandes -->
+          <div class="pagination">
+            <?php if ($nombrePagesCommandes > 1): ?>
+              <?php if ($pageActuelleCommandes > 1): ?>
+                <a href="?pageCommandes=<?= $pageActuelleCommandes - 1 ?>&tab=commandes" class="pagination-btn">&laquo; Précédent</a>
+              <?php endif; ?>
+
+              <?php for ($i = 1; $i <= $nombrePagesCommandes; $i++): ?>
+                <a href="?pageCommandes=<?= $i ?>&tab=commandes" class="pagination-btn <?= $i === $pageActuelleCommandes ? 'active' : '' ?>">
+                  <?= $i ?>
+                </a>
+              <?php endfor; ?>
+
+              <?php if ($pageActuelleCommandes < $nombrePagesCommandes): ?>
+                <a href="?pageCommandes=<?= $pageActuelleCommandes + 1 ?>&tab=commandes" class="pagination-btn">Suivant &raquo;</a>
+              <?php endif; ?>
+            <?php endif; ?>
+          </div>
         </div>
 
         <!-- Carte des livraisons -->
@@ -210,144 +314,140 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <script>
-            // Fonction pour calculer les statistiques à partir du tableau
-            function calculateStats() {
-                const rows = document.querySelectorAll('#commandesTable tbody tr');
-                const stats = new Map();
+// Stocker toutes les données de commandes pour les statistiques
+const allStatsData = <?= $statsJson ?>;
 
-                // Parcourir toutes les lignes du tableau
-                rows.forEach(row => {
-                    const produit = row.cells[1].textContent.trim();
-                    const client = row.cells[2].textContent.trim();
-                    const quantite = parseInt(row.cells[5].textContent.trim()) || 0;
+// Fonction mise à jour pour calculer les statistiques à partir de toutes les commandes
+function calculateStats() {
+    const stats = new Map();
 
-                    if (!stats.has(produit)) {
-                        stats.set(produit, {
-                            nombre_ventes: 0,
-                            clients: new Set(),
-                            quantite_totale: 0
-                        });
-                    }
+    // Utiliser toutes les commandes au lieu des lignes du tableau
+    allStatsData.forEach(commande => {
+        const produit = commande.id_produit;
+        const client = commande.nom_client;
+        const quantite = parseInt(commande.quantite) || 0;
 
-                    const produitStats = stats.get(produit);
-                    produitStats.nombre_ventes++;
-                    produitStats.clients.add(client);
-                    produitStats.quantite_totale += quantite;
-                });
+        if (!stats.has(produit)) {
+            stats.set(produit, {
+                nombre_ventes: 0,
+                clients: new Set(),
+                quantite_totale: 0
+            });
+        }
 
-                // Convertir la Map en tableau et trier par quantité totale
-                const statsArray = Array.from(stats.entries())
-                    .map(([produit, data]) => ({
-                        nom_produit: produit,
-                        nombre_ventes: data.nombre_ventes,
-                        nombre_clients: data.clients.size,
-                        quantite_totale: data.quantite_totale
-                    }))
-                    .sort((a, b) => b.quantite_totale - a.quantite_totale)
-                    .slice(0, 10); // Garder les 10 premiers
+        const produitStats = stats.get(produit);
+        produitStats.nombre_ventes++;
+        produitStats.clients.add(client);
+        produitStats.quantite_totale += quantite;
+    });
 
-                return statsArray;
-            }
+    // Convertir la Map en tableau et trier par quantité totale
+    const statsArray = Array.from(stats.entries())
+        .map(([produit, data]) => ({
+            nom_produit: produit,
+            nombre_ventes: data.nombre_ventes,
+            nombre_clients: data.clients.size,
+            quantite_totale: data.quantite_totale
+        }))
+        .sort((a, b) => b.quantite_totale - a.quantite_totale)
+        .slice(0, 10); // Garder les 10 premiers
 
-            // Fonction pour mettre à jour le graphique
-            function updateChart() {
-                const stats = calculateStats();
-                const ctx = document.getElementById('produitStats');
+    return statsArray;
+}
 
-                // Détruire le graphique existant s'il y en a un
-                const existingChart = Chart.getChart(ctx);
-                if (existingChart) {
-                    existingChart.destroy();
+// Fonction pour mettre à jour le graphique avec toutes les données
+function updateChart() {
+    const stats = calculateStats();
+    const ctx = document.getElementById('produitStats');
+
+    if (!stats || stats.length === 0) {
+        console.warn('Aucune donnée disponible pour les statistiques');
+        return;
+    }
+
+    // Détruire le graphique existant s'il y en a un
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: stats.map(item => item.nom_produit),
+            datasets: [
+                {
+                    label: 'Quantité totale vendue',
+                    data: stats.map(item => item.quantite_totale),
+                    backgroundColor: 'rgba(229, 9, 20, 0.7)',
+                    borderColor: 'rgba(229, 9, 20, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Nombre de clients uniques',
+                    data: stats.map(item => item.nombre_clients),
+                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 1
                 }
-
-                if (stats.length === 0) {
-                    console.warn('Aucune donnée disponible pour les statistiques');
-                    return;
-                }
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: stats.map(item => item.nom_produit),
-                        datasets: [
-                            {
-                                label: 'Quantité totale vendue',
-                                data: stats.map(item => item.quantite_totale),
-                                backgroundColor: 'rgba(229, 9, 20, 0.7)',
-                                borderColor: 'rgba(229, 9, 20, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Nombre de clients uniques',
-                                data: stats.map(item => item.nombre_clients),
-                                backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                                borderColor: 'rgba(255, 255, 255, 1)',
-                                borderWidth: 1
-                            }
-                        ]
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                },
-                                ticks: {
-                                    color: '#fff'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
-                                },
-                                ticks: {
-                                    color: '#fff',
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    color: '#fff',
-                                    font: {
-                                        size: 12
-                                    }
-                                }
-                            },
-                            title: {
-                                display: false
-                            }
+                    ticks: {
+                        color: '#fff'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#fff',
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#fff',
+                        font: {
+                            size: 12
                         }
                     }
-                });
-            }
-
-            // Mettre à jour les statistiques lors du chargement de l'onglet commandes
-            document.querySelector('[data-tab="commandes"]').addEventListener('click', updateChart);
-
-            // Mettre à jour les statistiques lors du chargement initial si l'onglet commandes est actif
-            document.addEventListener('DOMContentLoaded', function() {
-                if (document.querySelector('#commandes').classList.contains('active')) {
-                    updateChart();
+                },
+                title: {
+                    display: false
                 }
-            });
+            }
+        }
+    });
+}
 
-            // Mettre à jour les statistiques après chaque recherche ou tri
-            document.getElementById('searchCommandes').addEventListener('input', function() {
-                setTimeout(updateChart, 100); // Petit délai pour laisser le temps à la recherche de se faire
-            });
+// Supprimer les écouteurs d'événements liés à la recherche et au tri pour les statistiques
+// car nous voulons que les statistiques restent indépendantes de la pagination et de la recherche
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('commandes').classList.contains('active')) {
+        updateChart();
+    }
+});
 
-            document.getElementById('sortCommandes').addEventListener('change', function() {
-                setTimeout(updateChart, 100); // Petit délai pour laisser le temps au tri de se faire
-            });
-        </script>
+// Mettre à jour le graphique uniquement lors du changement d'onglet
+document.querySelector('[data-tab="commandes"]').addEventListener('click', function() {
+    setTimeout(updateChart, 100);
+});
+</script>
 
         <style>
           .search-sort-container {
@@ -455,6 +555,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           .leaflet-popup-tip {
             background: rgba(0, 0, 0, 0.8);
           }
+
+          .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+          }
+
+          .pagination-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+          }
+
+          .pagination-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+          }
+
+          .pagination-btn.active {
+            background: #e50914;
+            pointer-events: none;
+          }
         </style>
 
         <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
@@ -476,43 +602,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
           }
 
-          // Fonction pour initialiser la carte
+          // Fonction mise à jour pour initialiser la carte avec toutes les commandes
           async function initMap() {
             const map = L.map('delivery-map').setView([33.8869, 9.5375], 7); // Centre sur la Tunisie
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              maxZoom: 19
+                maxZoom: 19
             }).addTo(map);
 
-            // Récupérer toutes les commandes du tableau
-            const rows = document.querySelectorAll('#commandesTable tbody tr');
             const processedAddresses = new Map();
 
-            for (const row of rows) {
-              const client = row.cells[2].textContent.trim();
-              const adresse = row.cells[3].textContent.trim();
-              const coordinates = await getCoordinates(adresse);
+            // Utiliser toutes les commandes au lieu des lignes du tableau
+            for (const commande of allCommandes) {
+                const client = commande.client;
+                const adresse = commande.adresse;
+                const coordinates = await getCoordinates(adresse);
 
-              if (coordinates) {
-                const key = `${client}-${adresse}`;
-                if (!processedAddresses.has(key)) {
-                  const marker = L.marker(coordinates).addTo(map);
-                  
-                  // Regrouper toutes les commandes pour ce client à cette adresse
-                  const clientOrders = Array.from(rows).filter(r => 
-                    r.cells[2].textContent.trim() === client && 
-                    r.cells[3].textContent.trim() === adresse
-                  );
+                if (coordinates) {
+                    const key = `${client}-${adresse}`;
+                    if (!processedAddresses.has(key)) {
+                        const marker = L.marker(coordinates).addTo(map);
+                        
+                        // Regrouper toutes les commandes pour ce client à cette adresse
+                        const clientOrders = allCommandes.filter(c => 
+                            c.client === client && c.adresse === adresse
+                        );
 
-                  let popupContent = `<b>Client:</b> ${client}<br><b>Adresse:</b> ${adresse}<br><b>Commandes:</b><br>`;
-                  clientOrders.forEach(order => {
-                    popupContent += `- Produit: ${order.cells[1].textContent.trim()}, Quantité: ${order.cells[5].textContent.trim()}<br>`;
-                  });
+                        let popupContent = `<b>Client:</b> ${client}<br><b>Adresse:</b> ${adresse}<br><b>Commandes:</b><br>`;
+                        clientOrders.forEach(order => {
+                            popupContent += `- Produit: ${order.produit}, Quantité: ${order.quantite}<br>`;
+                        });
 
-                  marker.bindPopup(popupContent);
-                  processedAddresses.set(key, true);
+                        marker.bindPopup(popupContent);
+                        processedAddresses.set(key, true);
+                    }
                 }
-              }
             }
           }
 
@@ -525,19 +649,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           document.getElementById('downloadPDF').addEventListener('click', function() {
             window.location.href = 'generate_pdf.php';
           });
+
+          // Stocker toutes les commandes dans une variable JavaScript
+          const allCommandes = <?= $commandesJson ?>;
+
+          // Supprimer les écouteurs d'événements qui ne sont plus nécessaires
+          // La carte n'a plus besoin d'être mise à jour avec la pagination
+          document.addEventListener('DOMContentLoaded', function() {
+              if (document.getElementById('commandes').classList.contains('active')) {
+                  initMap();
+              }
+          });
+
+          document.querySelector('[data-tab="commandes"]').addEventListener('click', function() {
+              setTimeout(initMap, 100);
+          });
         </script>
       </section>
 
       <script>
         // Script pour basculer entre les onglets Produits et Commandes
         document.querySelectorAll('.tab-button').forEach(button => {
-          button.addEventListener('click', () => {
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tab = this.dataset.tab;
+                
+                // Construire l'URL en préservant les paramètres de pagination appropriés
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('tab', tab);
+                
+                // Préserver le bon paramètre de page selon l'onglet
+                if (tab === 'commandes') {
+                    const currentPageCommandes = urlParams.get('pageCommandes') || '1';
+                    urlParams.set('pageCommandes', currentPageCommandes);
+                    urlParams.delete('page'); // Supprimer le paramètre de page des produits
+                } else {
+                    const currentPage = urlParams.get('page') || '1';
+                    urlParams.set('page', currentPage);
+                    urlParams.delete('pageCommandes'); // Supprimer le paramètre de page des commandes
+                }
 
-            button.classList.add('active');
-            document.getElementById(button.dataset.tab).classList.add('active');
-          });
+                // Mettre à jour l'URL
+                window.history.pushState({}, '', '?' + urlParams.toString());
+                
+                // Activer l'onglet
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(tab).classList.add('active');
+
+                // Initialiser les fonctionnalités spécifiques à l'onglet commandes
+                if (tab === 'commandes') {
+                    if (typeof initMap === 'function') setTimeout(initMap, 100);
+                    if (typeof updateChart === 'function') setTimeout(updateChart, 100);
+                }
+            });
         });
 
         // Fonction de validation du formulaire
@@ -691,14 +858,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function searchProduits() {
           const searchValue = document.getElementById('searchProduits').value.toLowerCase();
           const rows = document.querySelectorAll('#produitsTable tbody tr');
+          let visibleCount = 0;
+          const startIndex = (<?= $pageActuelle ?> - 1) * <?= $produitsParPage ?>;
+          const endIndex = startIndex + <?= $produitsParPage ?>;
 
-          rows.forEach(row => {
+          rows.forEach((row, index) => {
             const id = row.cells[0].textContent.toLowerCase();
             const nom = row.cells[1].textContent.toLowerCase();
             const description = row.cells[2].textContent.toLowerCase();
             
             if (id.includes(searchValue) || nom.includes(searchValue) || description.includes(searchValue)) {
-              row.style.display = '';
+              if (index >= startIndex && index < endIndex) {
+                row.style.display = '';
+              } else {
+                row.style.display = 'none';
+              }
             } else {
               row.style.display = 'none';
             }
@@ -708,6 +882,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function searchCommandes() {
           const searchValue = document.getElementById('searchCommandes').value.toLowerCase();
           const rows = document.querySelectorAll('#commandesTable tbody tr');
+          let visibleCount = 0;
 
           rows.forEach(row => {
             const id = row.cells[0].textContent.toLowerCase();
@@ -715,7 +890,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const client = row.cells[2].textContent.toLowerCase();
             
             if (id.includes(searchValue) || produit.includes(searchValue) || client.includes(searchValue)) {
-              row.style.display = '';
+              if (visibleCount < <?= $commandesParPage ?>) {
+                row.style.display = '';
+                visibleCount++;
+              } else {
+                row.style.display = 'none';
+              }
             } else {
               row.style.display = 'none';
             }
@@ -887,6 +1067,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Charger les statistiques quand on affiche l'onglet commandes
         document.querySelector('[data-tab="commandes"]').addEventListener('click', loadProductStats);
+
+        // Mettre à jour le code JavaScript pour gérer l'onglet actif via l'URL
+        document.addEventListener('DOMContentLoaded', function() {
+            // Récupérer le paramètre tab de l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTab = urlParams.get('tab');
+
+            // Si un onglet est spécifié dans l'URL, l'activer
+            if (activeTab) {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                const tabButton = document.querySelector(`[data-tab="${activeTab}"]`);
+                if (tabButton) {
+                    tabButton.classList.add('active');
+                    document.getElementById(activeTab).classList.add('active');
+                    
+                    // Si on est sur l'onglet commandes, initialiser la carte et les statistiques
+                    if (activeTab === 'commandes') {
+                        if (typeof initMap === 'function') initMap();
+                        if (typeof updateChart === 'function') updateChart();
+                    }
+                }
+            }
+        });
+
+        // Mise à jour de la gestion des onglets
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTab = urlParams.get('tab') || 'produits';
+
+            function activateTab(tab) {
+                // Activer l'onglet approprié
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                const tabButton = document.querySelector(`[data-tab="${tab}"]`);
+                const tabContent = document.getElementById(tab);
+                
+                if (tabButton && tabContent) {
+                    tabButton.classList.add('active');
+                    tabContent.classList.add('active');
+                    
+                    if (tab === 'commandes') {
+                        if (typeof initMap === 'function') setTimeout(initMap, 100);
+                        if (typeof updateChart === 'function') setTimeout(updateChart, 100);
+                    }
+                }
+            }
+
+            // Activer l'onglet initial
+            activateTab(activeTab);
+
+            // Gestionnaire d'événements pour les clics sur les onglets
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tab = this.dataset.tab;
+                    window.location.href = this.href;
+                });
+            });
+
+            // Ajouter des gestionnaires d'événements aux liens de pagination
+            document.querySelectorAll('.pagination-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = this.href;
+                });
+            });
+        });
       </script>
     </main>
   </div>

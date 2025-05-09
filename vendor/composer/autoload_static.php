@@ -7,6 +7,11 @@ namespace Composer\Autoload;
 class ComposerStaticInitf0205c0fedf4b0bac3e0aa4c567cb1ec
 {
     public static $prefixLengthsPsr4 = array (
+        'c' => 
+        array (
+            'chillerlan\\Settings\\' => 20,
+            'chillerlan\\QRCode\\' => 18,
+        ),
         'S' => 
         array (
             'Svg\\' => 4,
@@ -37,6 +42,14 @@ class ComposerStaticInitf0205c0fedf4b0bac3e0aa4c567cb1ec
     );
 
     public static $prefixDirsPsr4 = array (
+        'chillerlan\\Settings\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/chillerlan/php-settings-container/src',
+        ),
+        'chillerlan\\QRCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/chillerlan/php-qrcode/src',
+        ),
         'Svg\\' => 
         array (
             0 => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg',

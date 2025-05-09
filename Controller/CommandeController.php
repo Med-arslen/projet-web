@@ -62,11 +62,45 @@ class CommandeController {
 
     // Read by ID
     public function getCommandeById($id_commande) {
-        $stmt = $this->pdo->prepare("SELECT * FROM commande WHERE id_commande = ?");
+        // Récupérer la commande principale
+        $stmt = $this->pdo->prepare("
+            SELECT c1.* 
+            FROM commande c1 
+            WHERE c1.id_commande = ?
+        ");
         $stmt->execute([$id_commande]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($row) {
-            return new Commande($row['id_commande'], $row['id_produit'], $row['nom_client'], $row['adresse'], $row['date_commande'], $row['quantite']);
+        $mainCommande = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($mainCommande) {
+            // Récupérer toutes les commandes associées (même client, même adresse, même date)
+            $stmt = $this->pdo->prepare("
+                SELECT * FROM commande 
+                WHERE nom_client = ? 
+                AND adresse = ? 
+                AND DATE(date_commande) = DATE(?)
+            ");
+            $stmt->execute([
+                $mainCommande['nom_client'],
+                $mainCommande['adresse'],
+                $mainCommande['date_commande']
+            ]);
+            
+            $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Créer un objet commande avec les données de la commande principale
+            $commandeObj = new Commande(
+                $mainCommande['id_commande'],
+                $mainCommande['id_produit'],
+                $mainCommande['nom_client'],
+                $mainCommande['adresse'],
+                $mainCommande['date_commande'],
+                $mainCommande['quantite']
+            );
+            
+            // Ajouter les produits associés
+            $commandeObj->setProduits($commandes);
+            
+            return $commandeObj;
         }
         return null;
     }

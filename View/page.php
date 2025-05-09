@@ -148,6 +148,18 @@
           <i class="fas fa-bell"></i>
           <span id="notification-count" class="notification-badge">0</span>
         </a>
+        <?php
+        // Récupérer la dernière commande
+        include_once '../Controller/CommandeController.php';
+        $commandeController = new CommandeController($pdo);
+        $commandes = $commandeController->getAllCommandes();
+        $derniereCommande = end($commandes);
+        if ($derniereCommande) : ?>
+          <a href="facture.php?id=<?= htmlspecialchars($derniereCommande['id']) ?>" class="facture-menu">
+            <i class="fas fa-file-invoice"></i>
+            <span>Dernière facture</span>
+          </a>
+        <?php endif; ?>
         <a href="panier.php" class="cart-menu">
           <i class="fas fa-shopping-cart"></i>
           <span id="cart-count">0</span>
@@ -177,10 +189,17 @@
         } else {
             foreach ($commandes as $commande) {
                 echo "<div class='notification-item'>";
+                echo "<div class='notification-content'>";
                 echo "<p><strong>Commande #" . htmlspecialchars($commande['id']) . "</strong></p>";
                 echo "<p>Produit: " . htmlspecialchars($commande['id_produit']) . "</p>";
                 echo "<p>Client: " . htmlspecialchars($commande['nom_client']) . "</p>";
                 echo "<p>Date: " . htmlspecialchars($commande['date_commande']) . "</p>";
+                echo "</div>";
+                echo "<div class='notification-actions'>";
+                echo "<a href='facture.php?id=" . htmlspecialchars($commande['id']) . "' class='btn-facture'>";
+                echo "<i class='fas fa-file-invoice'></i> Voir la facture";
+                echo "</a>";
+                echo "</div>";
                 echo "</div>";
             }
         }

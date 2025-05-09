@@ -1137,9 +1137,46 @@ footer {
 }
 
 .notification-item {
-    padding: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 8px;
+    position: relative;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.notification-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.notification-content {
+    margin-bottom: 10px;
+}
+
+.notification-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-facture {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background-color: #e50914;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.btn-facture:hover {
+    background-color: #ff0f1a;
+}
+
+.btn-facture i {
+    font-size: 1.1em;
 }
 
 .notification-item:last-child {
@@ -1168,4 +1205,49 @@ footer {
 
 .notification-items::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.4);
+}
+
+.facture-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.facture-menu:hover {
+    color: #e50914;
+}
+
+.facture-menu i {
+    font-size: 1.2em;
+}
+
+.btn-icon {
+    padding: 8px;
+    margin: 0 5px;
+    border-radius: 4px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-edit {
+    background-color: #4CAF50;
+}
+
+.btn-delete {
+    background-color: #f44336;
+}
+
+.btn-icon:hover {
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
+.fas {
+    font-size: 16px;
 }
