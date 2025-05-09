@@ -1,3 +1,8 @@
+<?php
+session_start();
+$formData = $_SESSION['form_data'] ?? [];
+unset($_SESSION['form_data']); // Clear the form data after retrieving it
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -15,21 +20,52 @@
 
     <div class="signup-container">
         <h2>Create Account</h2>
+        
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="error-message">
+                <?php 
+                    echo htmlspecialchars($_SESSION['error']);
+                    unset($_SESSION['error']);
+                ?>
+            </div>
+        <?php endif; ?>
+
         <form method="POST" action="../controllers/signupController.php" class="signup-form">
-    <input type="text" name="name" placeholder="Full name" required class="input-field" />
-    <input type="email" name="email" placeholder="Email" required class="input-field" />
-    <input type="password" name="password" placeholder="Password" required class="input-field" />
-    <input type="text" name="phone" placeholder="Phone Number" class="input-field" />
-    <input type="hidden" name="admin_id" value="0" />
+            <input type="text" 
+                   name="name" 
+                   placeholder="Full name" 
+                   
+                   class="input-field"
+                   value="<?= htmlspecialchars($formData['name'] ?? '') ?>" />
 
-    <select name="role" required class="input-field">
-        <option value="" disabled selected>Choose a role</option>
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-    </select>
+            <input type="email" 
+                   name="email" 
+                   placeholder="Email" 
+                    
+                   class="input-field"
+                   value="<?= htmlspecialchars($formData['email'] ?? '') ?>" />
 
-    <button type="submit" class="submit-btn">Sign Up</button>
-</form>
+            <input type="password" 
+                   name="password" 
+                   placeholder="Password (minimum 8 characters)" 
+                   
+                   minlength="8"
+                   class="input-field" />
+
+            <input type="text" 
+                   name="phone" 
+                   placeholder="Phone Number" 
+                   class="input-field"
+                   value="<?= htmlspecialchars($formData['phone'] ?? '') ?>" />
+
+            <select name="role"  class="input-field">
+                <option value="" disabled selected>Choose a role</option>
+                <option value="user" <?= (($formData['role'] ?? '') === 'user') ? 'selected' : '' ?>>User</option>
+                <option value="admin" <?= (($formData['role'] ?? '') === 'admin') ? 'selected' : '' ?>>Admin</option>
+            </select>
+
+            <button type="submit" class="submit-btn">Sign Up</button>
+        </form>
 
         <div class="footer">
             <p>Already have an account? <a href="login.php" class="link">Sign in</a></p>
@@ -37,7 +73,6 @@
     </div>
 
     <style>
-        /* General page layout */
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('cinema.jpg') no-repeat center center fixed;
@@ -45,36 +80,34 @@
             color: white;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            flex-direction: column;
         }
 
         header {
-            width: 100%;
+            padding: 20px;
             text-align: center;
-            margin-bottom: 20px;
         }
 
-        .header-container .logo {
+        .logo {
             max-width: 200px;
         }
 
-        /* Signup container */
         .signup-container {
             background-color: rgba(0, 0, 0, 0.8);
-            padding: 40px 30px;
+            padding: 40px;
             border-radius: 8px;
-            width: 100%;
+            width: 90%;
             max-width: 400px;
-            text-align: center;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
-        .signup-container h2 {
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
             font-size: 24px;
-            margin-bottom: 20px;
-            font-weight: bold;
         }
 
         .signup-form {
@@ -83,42 +116,50 @@
             gap: 15px;
         }
 
-        /* Form field styles */
         .input-field {
             padding: 12px;
-            font-size: 16px;
             border: 2px solid #444;
             border-radius: 5px;
             background-color: #222;
             color: white;
-            outline: none;
-            transition: border 0.3s ease-in-out;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
 
         .input-field:focus {
             border-color: #e50914;
+            outline: none;
         }
 
-        /* Button styling */
+        .error-message {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         .submit-btn {
             background-color: #e50914;
-            padding: 15px;
             color: white;
-            font-size: 16px;
+            padding: 12px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
         }
 
         .submit-btn:hover {
-            background-color: #b20710;
+            background-color: #f40612;
         }
 
-        /* Footer and links */
         .footer {
-            margin-top: 15px;
-            font-size: 14px;
+            text-align: center;
+            margin-top: 20px;
         }
 
         .link {
@@ -130,18 +171,22 @@
             text-decoration: underline;
         }
 
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
+        select.input-field {
+            appearance: none;
+            padding-right: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.5l-5-5h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        @media (max-width: 480px) {
             .signup-container {
-                padding: 20px 15px;
+                width: 95%;
+                padding: 20px;
             }
 
-            .input-field {
-                font-size: 14px;
-            }
-
-            .submit-btn {
-                padding: 12px;
+            .input-field, .submit-btn {
+                padding: 10px;
                 font-size: 14px;
             }
         }

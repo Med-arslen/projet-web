@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -70,13 +73,25 @@
     }
 
     .error-message {
-      background: #ff4444;
+      background-color: #000000;
+      border: 1px solid #ff0000;
       padding: 10px;
       border-radius: 4px;
       margin-bottom: 15px;
-      color: white;
+      color: #ff0000;
       font-size: 14px;
       text-align: center;
+    }
+
+    .success-message {
+      background-color: #000000;
+      border: 1px solid #ff0000;
+      color: #ff0000;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 14px;
     }
 
     .login-footer, .forgot-password {
@@ -98,19 +113,36 @@
   </header>
 
   <div class="login-container">
-    <h2>Sign In</h2>
+    <h2>Connexion</h2>
+    <?php if (isset($_SESSION['login_error'])): ?>
+      <div class="error-message">
+        <?php 
+          echo htmlspecialchars($_SESSION['login_error']);
+          unset($_SESSION['login_error']);
+        ?>
+      </div>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['success'])): ?>
+      <div class="success-message">
+        <?php 
+          echo htmlspecialchars($_SESSION['success']);
+          unset($_SESSION['success']);
+        ?>
+      </div>
+    <?php endif; ?>
+
     <form method="POST" action="../controllers/LoginController.php">
-      <input type="email" name="email" placeholder="Email" required aria-label="Email" />
-      <input type="password" name="password" placeholder="Password" required aria-label="Password" />
-      <?php if (isset($error) && $error) echo "<div class='error-message'>" . htmlspecialchars($error) . "</div>"; ?>
-      <button type="submit" name="login">Sign In</button>
+      <input type="email" name="email" placeholder="Email"  aria-label="Email" />
+      <input type="password" name="password" placeholder="Mot de passe" aria-label="Password" />
+      <button type="submit" name="login">Se connecter</button>
     </form>
 
     <div class="login-footer">
-      <p>New to MovieVibe? <a href="signup.php">Sign up now</a></p>
+      <p>Nouveau sur MovieVibe ? <a href="signup.php">Inscrivez-vous</a></p>
     </div>
     <div class="forgot-password">
-      <p><a href="forgot-password.php">Forgot your password?</a></p>
+      <p><a href="forgot-password.php">Mot de passe oublié ?</a></p>
     </div>
   </div>
 </body>

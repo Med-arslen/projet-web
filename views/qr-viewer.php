@@ -39,42 +39,41 @@ $qrFileName = $qrService->generateQRCode($userId, $qrData);
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #141414;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: #000000;
             margin: 0;
             padding: 20px;
+            color: #ffffff;
         }
         
         .qr-container {
-            background-color: #1f1f1f;
-            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
             border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 100%;
+            border: 1px solid #ff0000;
         }
         
         .qr-header {
-            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
         .qr-header h2 {
-            color: #E50914;
+            color: #ff0000;
             margin: 0;
             font-size: 24px;
         }
         
         .qr-image-container {
-            background-color: white;
+            background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
             margin: 20px auto;
             width: fit-content;
+            border: 1px solid #ff0000;
         }
         
         .qr-frame {
@@ -86,10 +85,11 @@ $qrFileName = $qrService->generateQRCode($userId, $qrData);
         
         .user-info {
             text-align: left;
-            background-color: #2a2a2a;
+            background-color: #000000;
             padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
+            border: 1px solid #ff0000;
         }
         
         .user-info p {
@@ -101,7 +101,7 @@ $qrFileName = $qrService->generateQRCode($userId, $qrData);
         .user-info i {
             width: 24px;
             margin-right: 10px;
-            color: #E50914;
+            color: #ff0000;
         }
         
         .action-buttons {
@@ -112,7 +112,7 @@ $qrFileName = $qrService->generateQRCode($userId, $qrData);
         }
         
         .btn {
-            background-color: #E50914;
+            background-color: #ff0000;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -127,37 +127,36 @@ $qrFileName = $qrService->generateQRCode($userId, $qrData);
         }
         
         .btn:hover {
-            background-color: #b2070f;
+            background-color: #cc0000;
         }
         
         .btn-secondary {
-            background-color: #2a2a2a;
+            background-color: #000000;
+            border: 1px solid #ff0000;
         }
         
         .btn-secondary:hover {
-            background-color: #3a3a3a;
+            background-color: #ff0000;
         }
         
         .info-message {
-            background-color: #2a2a2a;
+            background-color: #000000;
+            border: 1px solid #ff0000;
             padding: 15px;
             border-radius: 8px;
             margin-top: 20px;
             font-size: 14px;
-            color: #999;
+            color: #ff0000;
         }
 
         @media print {
             body {
                 background-color: white;
-                color: black;
             }
-            
             .qr-container {
-                box-shadow: none;
-                background-color: white;
+                border: none;
+                padding: 0;
             }
-            
             .action-buttons {
                 display: none;
             }

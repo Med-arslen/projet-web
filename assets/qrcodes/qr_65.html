@@ -1,0 +1,18 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>QR Code</title>
+            <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+        </head>
+        <body style="margin:0;display:flex;justify-content:center;align-items:center;background:white;">
+            <div id="qrcode"></div>
+            <script>
+            new QRCode(document.getElementById("qrcode"), {
+                text: "eyJpZCI6NjUsIm5hbWUiOiJ4eHgiLCJlbWFpbCI6Inh4eEBlc3ByaXQudG4iLCJyb2xlIjoiYWRtaW4iLCJwaG9uZSI6Ijc4OTQ1NjMzIn0=",
+                width: 256,
+                height: 256
+            });
+            </script>
+        </body>
+        </html>

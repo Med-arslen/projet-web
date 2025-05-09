@@ -6,30 +6,31 @@
     <title>Mot de passe oublié</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7fc;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
+            background-color: #000000;
+            color: #ffffff;
         }
 
         .forgot-password-container {
-            background-color: white;
-            padding: 40px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
             border-radius: 8px;
+            width: 90%;
             max-width: 400px;
-            width: 100%;
-            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #ff0000;
         }
 
         h2 {
-            font-size: 24px;
+            text-align: center;
+            color: #ff0000;
             margin-bottom: 20px;
-            color: #333;
         }
 
         form {
@@ -41,19 +42,22 @@
         input[type="email"] {
             padding: 10px;
             font-size: 16px;
-            border: 1px solid #ddd;
+            border: 1px solid #ff0000;
             border-radius: 4px;
             width: 100%;
             box-sizing: border-box;
+            background-color: #000000;
+            color: #ffffff;
         }
 
         input[type="email"]:focus {
             outline: none;
-            border-color: #0056b3;
+            border-color: #ff0000;
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.25);
         }
 
         button {
-            background-color: #0056b3;
+            background-color: #ff0000;
             color: white;
             padding: 12px;
             font-size: 16px;
@@ -64,13 +68,25 @@
         }
 
         button:hover {
-            background-color: #003d80;
+            background-color: #cc0000;
         }
 
         .message {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #777;
+            background-color: #000000;
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .success {
+            border-color: #ff0000;
+        }
+
+        .error {
+            border-color: #ff0000;
         }
     </style>
 </head>
@@ -80,7 +96,7 @@
         <h2>Mot de passe oublié</h2>
 
         <form method="POST" action="reset-password.php">
-            <input type="email" name="email" placeholder="Entrez votre email" required />
+            <input type="email" name="email" placeholder="Entrez votre email" />
             <button type="submit">Réinitialiser le mot de passe</button>
         </form>
 

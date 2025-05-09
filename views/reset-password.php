@@ -14,15 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         // Afficher le formulaire pour modifier le mot de passe
         echo '
-        <div class="container">
+        <div class="reset-password-container">
             <h2>Réinitialiser votre mot de passe</h2>
             <form method="POST" action="">
-                <label for="password">Nouveau mot de passe :</label>
-                <input type="password" name="password" placeholder="Entrez votre nouveau mot de passe" required />
-                
-                <label for="confirm_password">Confirmez le mot de passe :</label>
-                <input type="password" name="confirm_password" placeholder="Confirmez votre mot de passe" required />
-
+                <div class="form-group">
+                    <label for="password">Nouveau mot de passe :</label>
+                    <input type="password" name="password" placeholder="Entrez votre nouveau mot de passe" />
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirmez le mot de passe :</label>
+                    <input type="password" name="confirm_password" placeholder="Confirmez votre mot de passe" />
+                </div>
                 <button type="submit">Réinitialiser le mot de passe</button>
             </form>
         </div>';
@@ -53,70 +55,83 @@ if (isset($_POST['password'])) {
 ?>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        color: #333;
-        margin: 0;
-        padding: 0;
-    }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #000000;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
 
-    .container {
-        max-width: 400px;
-        margin: 50px auto;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+        .reset-password-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #ff0000;
+        }
 
-    h2 {
-        text-align: center;
-        color: #5C6BC0;
-    }
+        h2 {
+            text-align: center;
+            color: #ff0000;
+            margin-bottom: 30px;
+        }
 
-    form {
-        display: flex;
-        flex-direction: column;
-    }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    label {
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ff0000;
+        }
 
-    input[type="password"] {
-        padding: 10px;
-        margin: 10px 0 20px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
-    }
+        input {
+            width: 100%;
+            padding: 10px;
+            background-color: #000000;
+            border: 1px solid #ff0000;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 14px;
+        }
 
-    button {
-        padding: 12px;
-        background-color: #5C6BC0;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
+        input:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.25);
+        }
 
-    button:hover {
-        background-color: #3949AB;
-    }
+        button {
+            padding: 12px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
 
-    .error {
-        color: red;
-        text-align: center;
-        margin-top: 20px;
-    }
+        button:hover {
+            background-color: #cc0000;
+        }
 
-    .success {
-        color: green;
-        text-align: center;
-        margin-top: 20px;
-    }
-</style>
+        .error, .success {
+            color: #ff0000;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ff0000;
+            border-radius: 4px;
+            background-color: #000000;
+        }
+    </style>

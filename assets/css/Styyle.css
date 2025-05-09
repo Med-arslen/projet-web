@@ -1,11 +1,12 @@
 .login-container {
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(0, 0, 0, 0.95);
     padding: 30px;
     width: 320px;
     margin: 80px auto;
     border-radius: 12px;
-    box-shadow: 0 0 10px #00000055;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
     text-align: center;
+    border: 1px solid #ff0000;
   }
   
   .login-container input,
@@ -15,23 +16,30 @@
     padding: 12px;
     margin-top: 12px;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid #ff0000;
     font-size: 16px;
+    background-color: #000000;
+    color: #ffffff;
   }
   
   .login-container button {
-    background-color: #ac7b7b;
-    color: white;
+    background-color: #ff0000;
+    color: #ffffff;
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s ease;
   }
   
   .login-container button:hover {
-    background-color: #8e5d5d;
+    background-color: #cc0000;
   }
   
   .language-switcher {
     margin-top: 20px;
   }
-  
+
+  .language-switcher select {
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #ff0000;
+  }
