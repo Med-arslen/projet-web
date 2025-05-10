@@ -223,11 +223,16 @@ $statsJson = json_encode($allStatsData);
           <div class="title-section">
             <h1>Gestion des Commandes</h1>
             <p class="subtitle">Vue d'ensemble des commandes</p>
-          </div>
-          <div class="form-actions">
+          </div>          <div class="form-actions">
             <a href="facture.php" class="btn btn-primary">
               <i class="fas fa-file-invoice"></i> Voir la dernière facture
             </a>
+            <div class="search-client-invoice">
+              <input type="text" id="clientName" placeholder="Nom du client">
+              <button onclick="searchClientInvoices()" class="btn btn-primary">
+                <i class="fas fa-search"></i> Rechercher les factures
+              </button>
+            </div>
           </div>
         </div>
 
@@ -441,22 +446,55 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('commandes').classList.contains('active')) {
         updateChart();
     }
-});
-
-// Mettre à jour le graphique uniquement lors du changement d'onglet
+});        // Mettre à jour le graphique uniquement lors du changement d'onglet
 document.querySelector('[data-tab="commandes"]').addEventListener('click', function() {
     setTimeout(updateChart, 100);
 });
+
+        // Fonction pour rechercher les factures d'un client
+        function searchClientInvoices() {
+            const clientName = document.getElementById('clientName').value.trim();
+            if (clientName) {
+                window.location.href = `facture.php?client=${encodeURIComponent(clientName)}`;
+            } else {
+                alert('Veuillez entrer un nom de client');
+            }
+        }
+
+        // Permettre la recherche avec la touche Enter
+        document.getElementById('clientName')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchClientInvoices();
+            }
+        });
 </script>
 
-        <style>
-          .search-sort-container {
+        <style>          .search-sort-container {
             display: flex;
             gap: 20px;
             margin-bottom: 20px;
             padding: 15px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
+          }
+
+          .search-client-invoice {
+            display: flex;
+            gap: 10px;
+            margin-left: 10px;
+          }
+
+          .search-client-invoice input {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+          }
+
+          .search-client-invoice input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
           }
 
           .search-box {
@@ -580,6 +618,21 @@ document.querySelector('[data-tab="commandes"]').addEventListener('click', funct
           .pagination-btn.active {
             background: #e50914;
             pointer-events: none;
+          }
+
+          #commandesTable tbody tr {
+            cursor: pointer;
+            transition: background-color 0.3s;
+          }
+
+          #commandesTable tbody tr:hover {
+            background-color: rgba(229, 9, 20, 0.1);
+          }
+
+          .commande-details p {
+            margin: 10px 0;
+            font-size: 16px;
+            line-height: 1.5;
           }
         </style>
 
@@ -1140,5 +1193,217 @@ document.querySelector('[data-tab="commandes"]').addEventListener('click', funct
       </script>
     </main>
   </div>
+
+<!-- Modal Produit -->
+<div id="produitModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Détails du Produit</h2>
+    <div class="modal-body">
+      <div class="product-image">
+        <img id="modalImage" src="" alt="Image du produit">
+      </div>
+      <div class="product-details">
+        <p><strong>ID:</strong> <span id="modalId"></span></p>
+        <p><strong>Nom:</strong> <span id="modalNom"></span></p>
+        <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+        <p><strong>Prix:</strong> <span id="modalPrix"></span> €</p>
+        <p><strong>Quantité en stock:</strong> <span id="modalQuantite"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Commande -->
+<div id="commandeModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Détails de la Commande</h2>
+    <div class="modal-body">
+      <div class="commande-details">
+        <p><strong>ID:</strong> <span id="modalCommandeId"></span></p>
+        <p><strong>Produit:</strong> <span id="modalCommandeProduit"></span></p>
+        <p><strong>Client:</strong> <span id="modalCommandeClient"></span></p>
+        <p><strong>Adresse:</strong> <span id="modalCommandeAdresse"></span></p>
+        <p><strong>Date:</strong> <span id="modalCommandeDate"></span></p>
+        <p><strong>Quantité:</strong> <span id="modalCommandeQuantite"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+  background-color: #1f1f1f;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 800px;
+  border-radius: 8px;
+  color: white;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #e50914;
+  text-decoration: none;
+}
+
+.modal-body {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.product-image {
+  flex: 0 0 40%;
+}
+
+.product-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.product-details {
+  flex: 0 0 60%;
+}
+
+.product-details p {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+#produitsTable tbody tr {
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#produitsTable tbody tr:hover {
+  background-color: rgba(229, 9, 20, 0.1);
+}
+
+#commandesTable tbody tr {
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#commandesTable tbody tr:hover {
+  background-color: rgba(229, 9, 20, 0.1);
+}
+
+.commande-details p {
+  margin: 10px 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+</style>
+
+<script>
+
+// Ajouter les gestionnaires d'événements pour le modal
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('produitModal');
+  const span = document.getElementsByClassName('close')[0];
+  
+  // Ajouter un gestionnaire de clic sur chaque ligne du tableau des produits
+  document.querySelectorAll('#produitsTable tbody tr').forEach(row => {
+    row.addEventListener('click', function() {
+      const id = this.cells[0].textContent;
+      const nom = this.cells[1].textContent;
+      const description = this.cells[2].textContent;
+      const prix = this.cells[3].textContent;
+      const quantite = this.cells[4].textContent;
+      const imageSrc = this.cells[5].querySelector('img').src;
+
+      // Mettre à jour le contenu du modal
+      document.getElementById('modalId').textContent = id;
+      document.getElementById('modalNom').textContent = nom;
+      document.getElementById('modalDescription').textContent = description;
+      document.getElementById('modalPrix').textContent = prix;
+      document.getElementById('modalQuantite').textContent = quantite;
+      document.getElementById('modalImage').src = imageSrc;
+
+      // Afficher le modal
+      modal.style.display = 'block';
+    });
+  });
+
+  // Fermer le modal quand on clique sur le X
+  span.onclick = function() {
+    modal.style.display = 'none';
+  }
+
+  // Fermer le modal quand on clique en dehors
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  // Modal Commande
+  const commandeModal = document.getElementById('commandeModal');
+  const commandeSpan = commandeModal.getElementsByClassName('close')[0];
+  
+  // Ajouter un gestionnaire de clic sur chaque ligne du tableau des commandes
+  document.querySelectorAll('#commandesTable tbody tr').forEach(row => {
+    row.addEventListener('click', function() {
+      const id = this.cells[0].textContent;
+      const produit = this.cells[1].textContent;
+      const client = this.cells[2].textContent;
+      const adresse = this.cells[3].textContent;
+      const date = this.cells[4].textContent;
+      const quantite = this.cells[5].textContent;
+
+      // Mettre à jour le contenu du modal
+      document.getElementById('modalCommandeId').textContent = id;
+      document.getElementById('modalCommandeProduit').textContent = produit;
+      document.getElementById('modalCommandeClient').textContent = client;
+      document.getElementById('modalCommandeAdresse').textContent = adresse;
+      document.getElementById('modalCommandeDate').textContent = date;
+      document.getElementById('modalCommandeQuantite').textContent = quantite;
+
+      // Afficher le modal
+      commandeModal.style.display = 'block';
+    });
+  });
+
+  // Fermer le modal commande quand on clique sur le X
+  commandeSpan.onclick = function() {
+    commandeModal.style.display = 'none';
+  }
+
+  // Mettre à jour la fonction de fermeture des modals lors d'un clic à l'extérieur
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+    if (event.target == commandeModal) {
+      commandeModal.style.display = 'none';
+    }
+  }
+});
+</script>
+
 </body>
 </html>

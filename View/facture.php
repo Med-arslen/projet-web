@@ -11,21 +11,47 @@ use chillerlan\QRCode\Output\QROutputInterface;
 $commandeController = new CommandeController($pdo);
 $produitController = new ProduitController($pdo);
 
-// Récupérer l'ID de la commande depuis l'URL
+// Récupérer les paramètres de l'URL
 $id_commande = isset($_GET['id']) ? $_GET['id'] : null;
+$client_name = isset($_GET['client']) ? $_GET['client'] : null;
 
-// Si pas d'ID spécifié, rediriger vers la dernière commande
-if (!$id_commande) {
-    $commandes = $commandeController->getAllCommandes();
-    $derniereCommande = end($commandes);
-    if (!$derniereCommande) {
+// Variables pour stocker les commandes
+$commandes = [];
+$derniereCommande = null;
+
+if ($client_name) {
+    // Récupérer toutes les commandes du client
+    $all_commandes = $commandeController->getAllCommandes();
+    $commandes = array_filter($all_commandes, function($commande) use ($client_name) {
+        return strcasecmp($commande['nom_client'], $client_name) === 0;
+    });
+    
+    if (empty($commandes)) {
+        $_SESSION['error_message'] = "Aucune facture trouvée pour le client : " . htmlspecialchars($client_name);
+        header('Location: index.php?tab=commandes');
+        exit;
+    }
+    
+    // Trier les commandes par date (la plus récente en premier)
+    usort($commandes, function($a, $b) {
+        return strtotime($b['date_commande']) - strtotime($a['date_commande']);
+    });
+    
+    $derniereCommande = $commandeController->getCommandeById($commandes[0]['id']);
+} else if ($id_commande) {
+    // Récupérer une commande spécifique
+    $derniereCommande = $commandeController->getCommandeById($id_commande);
+    $commandes = [$derniereCommande];
+} else {
+    // Si pas d'ID ni de client spécifié, rediriger vers la dernière commande
+    $all_commandes = $commandeController->getAllCommandes();
+    $derniere = end($all_commandes);
+    if (!$derniere) {
         header('Location: page.php');
         exit;
     }
-    $derniereCommande = $commandeController->getCommandeById($derniereCommande['id']);
-} else {
-    // Sinon, récupérer la commande spécifique
-    $derniereCommande = $commandeController->getCommandeById($id_commande);
+    $derniereCommande = $commandeController->getCommandeById($derniere['id']);
+    $commandes = [$derniereCommande];
 }
 
 if (!$derniereCommande) {
@@ -69,7 +95,6 @@ $options = new QROptions([
 // Création du QR code
 $qrcode = new QRCode($options);
 $qrCodeImage = $qrcode->render(json_encode($qrData));
-
 ?>
 
 <!DOCTYPE html>
@@ -81,9 +106,42 @@ $qrCodeImage = $qrcode->render(json_encode($qrData));
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 </head>
-<body>
-    <div class="wrapper">
+<body>    <div class="wrapper">
         <main class="main-content">
+            <?php if (count($commandes) > 1): ?>
+            <div class="factures-list">
+                <h2>Factures de <?= htmlspecialchars($client_name) ?></h2>
+                <div class="factures-grid">
+                    <?php foreach ($commandes as $cmd): 
+                        $cmdObj = $commandeController->getCommandeById($cmd['id']);
+                        $totalCmd = 0;
+                        foreach ($cmdObj->getProduits() as $p) {
+                            $prod = $produitController->getProduitById($p['id_produit']);
+                            $totalCmd += $prod->getPrix() * $p['quantite'];
+                        }
+                    ?>
+                        <div class="facture-card" onclick="window.location.href='facture.php?id=<?= $cmd['id'] ?>'">
+                            <div class="facture-card-header">
+                                <h3>Facture #<?= $cmd['id'] ?></h3>
+                                <p class="date"><?= $cmd['date_commande'] ?></p>
+                            </div>
+                            <div class="facture-card-body">
+                                <p><strong>Total:</strong> <?= number_format($totalCmd, 2) ?> €</p>
+                                <p><strong>Adresse:</strong> <?= htmlspecialchars($cmd['adresse']) ?></p>
+                            </div>
+                            <div class="facture-card-footer">
+                                <button class="btn btn-primary">Voir détails</button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="factures-actions">
+                    <a href="index.php?tab=commandes" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                </div>
+            </div>
+            <?php else: ?>
             <div class="facture-container">
                 <div class="facture-header">
                     <div class="logo">
@@ -141,9 +199,7 @@ $qrCodeImage = $qrcode->render(json_encode($qrData));
                 <div class="qr-code-container">
                     <h3>Scanner pour plus d'informations</h3>
                     <img src="<?= $qrCodeImage ?>" alt="QR Code de la facture">
-                </div>
-
-                <div class="facture-actions">
+                </div>                <div class="facture-actions">
                     <a href="page.php" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Retour
                     </a>
@@ -152,10 +208,71 @@ $qrCodeImage = $qrcode->render(json_encode($qrData));
                     </button>
                 </div>
             </div>
+            <?php endif; ?>
         </main>
-    </div>
+    </div><style>
+        .factures-list {
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
 
-    <style>
+        .factures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .facture-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .facture-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .facture-card-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .facture-card-header h3 {
+            margin: 0 0 0.5rem 0;
+            color: #e50914;
+        }
+
+        .date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .facture-card-body {
+            padding: 1rem 0;
+        }
+
+        .facture-card-body p {
+            margin: 0.5rem 0;
+        }
+
+        .facture-card-footer {
+            margin-top: 1rem;
+            text-align: right;
+        }
+
+        .factures-actions {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: flex-start;
+        }
+
         .facture-container {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;

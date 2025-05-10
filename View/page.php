@@ -7,8 +7,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
   <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
-  <script defer src="scriptpage.js"></script>
-  <style>
+  <script defer src="scriptpage.js"></script>  <style>
+    .search-invoice {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+    }
+
+    .invoice-search-input {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      padding: 8px;
+      border-radius: 4px;
+      color: white;
+      margin-right: 5px;
+      font-size: 14px;
+      width: 150px;
+    }
+
+    .invoice-search-input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .invoice-search-input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .invoice-search-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    .invoice-search-btn:hover {
+      color: #e50914;
+    }
+
     .modal {
       display: none;
       position: fixed;
@@ -139,16 +176,14 @@
         <a id="logo" href="#home"><img src="logo.png" alt="MovieVibe Logo" id="logo1"></a>
       </div>      
       <nav class="main-nav">                
-        <a href="#home" class="active">Accueil</a>
-        <a href="#boutique">Boutique</a>
-        <a href="#reclamations">Réclamation</a>
+      <a href="#home" class="active" style="font-size: 15px;">Accueil</a>
+      <a href="#boutique" style="font-size: 15px;">Boutique</a>
+      <a href="#evenement" style="font-size: 15px;">Evénement</a>
+      <a href="#reclamations" style="font-size: 15px;">Réclamation</a>
+
+
       </nav>
-      <nav class="sub-nav">
-        <a href="#" id="notification-icon" class="notification-menu">
-          <i class="fas fa-bell"></i>
-          <span id="notification-count" class="notification-badge">0</span>
-        </a>
-        <?php
+      <nav class="sub-nav">        <?php
         // Récupérer la dernière commande
         include_once '../Controller/CommandeController.php';
         $commandeController = new CommandeController($pdo);
@@ -159,6 +194,12 @@
             <i class="fas fa-file-invoice"></i>
             <span>Dernière facture</span>
           </a>
+          <div class="search-invoice">
+            <input type="text" id="clientNameSearch" placeholder="Nom du client" class="invoice-search-input">
+            <button onclick="searchClientInvoices()" class="invoice-search-btn">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
         <?php endif; ?>
         <a href="panier.php" class="cart-menu">
           <i class="fas fa-shopping-cart"></i>
@@ -171,41 +212,6 @@
         </a>
       </nav>      
     </header>
-
-    <!-- Notification Modal -->
-    <div id="notification-modal" class="notification-modal hidden">
-      <div class="notification-header">
-        <h2>Historique des Commandes</h2>
-        <button id="close-notification">&times;</button>
-      </div>
-      <div id="notification-items" class="notification-items">
-        <?php
-        include_once '../Controller/CommandeController.php';
-        $commandeController = new CommandeController($pdo);
-        $commandes = $commandeController->getAllCommandes();
-        
-        if (empty($commandes)) {
-            echo "<p>Aucune commande dans l'historique.</p>";
-        } else {
-            foreach ($commandes as $commande) {
-                echo "<div class='notification-item'>";
-                echo "<div class='notification-content'>";
-                echo "<p><strong>Commande #" . htmlspecialchars($commande['id']) . "</strong></p>";
-                echo "<p>Produit: " . htmlspecialchars($commande['id_produit']) . "</p>";
-                echo "<p>Client: " . htmlspecialchars($commande['nom_client']) . "</p>";
-                echo "<p>Date: " . htmlspecialchars($commande['date_commande']) . "</p>";
-                echo "</div>";
-                echo "<div class='notification-actions'>";
-                echo "<a href='facture.php?id=" . htmlspecialchars($commande['id']) . "' class='btn-facture'>";
-                echo "<i class='fas fa-file-invoice'></i> Voir la facture";
-                echo "</a>";
-                echo "</div>";
-                echo "</div>";
-            }
-        }
-        ?>
-      </div>
-    </div>
 
     <!-- MAIN CONTAINER -->
     <section class="main-container" id="boutique">
@@ -292,8 +298,24 @@
     <footer>
       <p>&copy; 2025 MovieVibe. Tous droits réservés.</p>
     </footer>
-  </div>
-  <script>
+  </div>  <script>
+    // Fonction pour rechercher les factures d'un client
+    function searchClientInvoices() {
+      const clientName = document.getElementById('clientNameSearch').value.trim();
+      if (clientName) {
+        window.location.href = `facture.php?client=${encodeURIComponent(clientName)}`;
+      } else {
+        alert('Veuillez entrer un nom de client');
+      }
+    }
+
+    // Permettre la recherche avec la touche Enter
+    document.getElementById('clientNameSearch')?.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        searchClientInvoices();
+      }
+    });
+
     document.querySelectorAll('.product-item img').forEach(img => {
       img.addEventListener('click', function() {
         const productId = this.closest('.product-item').querySelector('.add-to-cart').dataset.productId;

@@ -1071,141 +1071,25 @@ footer {
 }
 
 /* Notification Icon and Modal Styles */
-.notification-menu {
-    position: relative;
-    cursor: pointer;
+.notification-bell {
+  position: relative;
+  cursor: pointer;
 }
 
-.notification-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: #e50914;
-    color: white;
-    border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 12px;
-    min-width: 18px;
-    text-align: center;
+.notification-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e50914;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  min-width: 16px;
+  text-align: center;
 }
 
-.notification-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 500px;
-    background-color: #000;
-    color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    z-index: 1000;
-}
-
-.notification-modal.hidden {
-    display: none;
-}
-
-.notification-header {
-    background-color: #e50914;
-    color: #fff;
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 8px 8px 0 0;
-}
-
-.notification-header h2 {
-    margin: 0;
-    font-size: 18px;
-}
-
-.notification-header button {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.notification-items {
-    padding: 16px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.notification-item {
-    position: relative;
-    padding: 15px;
-    margin-bottom: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-}
-
-.notification-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.notification-content {
-    margin-bottom: 10px;
-}
-
-.notification-actions {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.btn-facture {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 15px;
-    background-color: #e50914;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 0.9em;
-    transition: background-color 0.3s ease;
-}
-
-.btn-facture:hover {
-    background-color: #ff0f1a;
-}
-
-.btn-facture i {
-    font-size: 1.1em;
-}
-
-.notification-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.notification-item p {
-    margin: 4px 0;
-    font-size: 14px;
-}
-
-.notification-items::-webkit-scrollbar {
-    width: 6px;
-}
-
-.notification-items::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-}
-
-.notification-items::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-}
-
-.notification-items::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4);
-}
+/* Suppression du bloc de style des notifications */
 
 .facture-menu {
     position: relative;
