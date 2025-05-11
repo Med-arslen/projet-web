@@ -1,18 +1,18 @@
 <?php
 include_once __DIR__ . '/../Model/Reclamation.php';
 include_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../lib/PHPMailer.php';
 
 class ReclamationController {
-    // Afficher une réclamation
-    public function showReclamation($id)
-    {
-        // Vérification si l'ID est passé et valide
+
+    public function showReclamation($id) {
         if (empty($id) || !is_numeric($id)) {
             die('ID de réclamation invalide.');
         }
 
         $sql = "SELECT * FROM reclamationn WHERE id_rec = :id_rec";
         $db = config::getConnexion();
+
         try {
             $query = $db->prepare($sql);
             $query->execute([':id_rec' => $id]);
@@ -23,11 +23,10 @@ class ReclamationController {
         }
     }
 
-    // Lister toutes les réclamations
-    public function listReclamations()
-    {
+    public function listReclamations() {
         $sql = "SELECT * FROM reclamationn";
         $db = config::getConnexion();
+
         try {
             return $db->query($sql);
         } catch (PDOException $e) {
@@ -36,17 +35,20 @@ class ReclamationController {
         }
     }
 
-    // Mettre à jour une réclamation
-    public function updateReclamation($reclamationn, $id)
-    {
-        // Vérification si l'ID est valide
+    public function updateReclamation($reclamationn, $id) {
         if (empty($id) || !is_numeric($id)) {
             die('ID de réclamation invalide.');
         }
 
         try {
-            // Validation des données avant de les exécuter
-            if (empty($reclamationn->getNomPrenom()) || empty($reclamationn->getEmail()) || empty($reclamationn->getNomFilm()) || empty($reclamationn->getTypeRec()) || empty($reclamationn->getDetail()) || empty($reclamationn->getReponseRec())) {
+            if (
+                empty($reclamationn->getNomPrenom()) ||
+                empty($reclamationn->getEmail()) ||
+                empty($reclamationn->getNomFilm()) ||
+                empty($reclamationn->getTypeRec()) ||
+                empty($reclamationn->getDetail()) ||
+                empty($reclamationn->getReponseRec())
+            ) {
                 throw new Exception("Tous les champs doivent être remplis.");
             }
 
@@ -59,59 +61,54 @@ class ReclamationController {
                     type_rec = :type_rec,
                     detail = :detail,
                     reponse_rec = :reponse_rec
-                WHERE id_rec = :id_rec'
+                 WHERE id_rec = :id_rec'
             );
 
-            $query->execute([ 
-                'id_rec'    => $id,
-                'nomprenom' => $reclamationn->getNomPrenom(),
-                'email'     => $reclamationn->getEmail(),
-                'nomfilm'   => $reclamationn->getNomFilm(),
-                'type_rec'  => $reclamationn->getTypeRec(),
-                'detail'    => $reclamationn->getDetail(),
-                'reponse_rec'    => $reclamationn->getReponseRec()
+            $query->execute([
+                'id_rec'       => $id,
+                'nomprenom'    => $reclamationn->getNomPrenom(),
+                'email'        => $reclamationn->getEmail(),
+                'nomfilm'      => $reclamationn->getNomFilm(),
+                'type_rec'     => $reclamationn->getTypeRec(),
+                'detail'       => $reclamationn->getDetail(),
+                'reponse_rec'  => $reclamationn->getReponseRec()
             ]);
 
-            // Message de succès
             echo "Réclamation mise à jour avec succès.";
-            
         } catch (PDOException $e) {
-            error_log("Erreur lors de la mise à jour de la réclamation : " . $e->getMessage());
-            echo "Erreur lors de la mise à jour de la réclamation : " . $e->getMessage();
+            error_log("Erreur lors de la mise à jour : " . $e->getMessage());
+            echo "Erreur de mise à jour : " . $e->getMessage();
         } catch (Exception $e) {
             echo "Erreur : " . $e->getMessage();
         }
     }
 
-    // Ajouter une nouvelle réclamation
-    public function addReclamation($reclamationn)
-    {
-        $sql = "INSERT INTO reclamationn (nomprenom,email,nomfilm,type_rec, detail, reponse_rec)
-                VALUES (:nomprenom, :email, :nomfilm, :type_rec, :detail , :reponse_rec)";
-    
+    public function addReclamation($reclamationn) {
+        $sql = "INSERT INTO reclamationn (nomprenom, email, nomfilm, type_rec, detail, reponse_rec)
+                VALUES (:nomprenom, :email, :nomfilm, :type_rec, :detail, :reponse_rec)";
         $db = config::getConnexion();
-    
+
         try {
             $query = $db->prepare($sql);
             $result = $query->execute([
-                'nomprenom'   => $reclamationn->getNomPrenom(),
-                'email'       => $reclamationn->getEmail(),
-                'nomfilm'     => $reclamationn->getNomFilm(),
-                'type_rec'    => $reclamationn->getTypeRec(),
-                'detail'      => $reclamationn->getDetail(),
-                'reponse_rec' => $reclamationn->getReponseRec()
+                'nomprenom'    => $reclamationn->getNomPrenom(),
+                'email'        => $reclamationn->getEmail(),
+                'nomfilm'      => $reclamationn->getNomFilm(),
+                'type_rec'     => $reclamationn->getTypeRec(),
+                'detail'       => $reclamationn->getDetail(),
+                'reponse_rec'  => $reclamationn->getReponseRec()
             ]);
 
             if ($result) {
                 $id_rec = $db->lastInsertId();
                 return json_encode([
                     'success' => true,
-                    'data' => ['id_rec' => $id_rec]
+                    'data'    => ['id_rec' => $id_rec]
                 ]);
             } else {
                 return json_encode([
                     'success' => false,
-                    'message' => "Une erreur est survenue lors de l'enregistrement."
+                    'message' => "Erreur lors de l'enregistrement."
                 ]);
             }
         } catch (PDOException $e) {
@@ -122,240 +119,409 @@ class ReclamationController {
         }
     }
 
-    // Supprimer une réclamation
-    public function deleteReclamation($id)
-    {
-        // Vérification si l'ID est valide
+    public function deleteReclamation($id) {
         if (empty($id) || !is_numeric($id)) {
             throw new Exception('ID de réclamation invalide.');
         }
 
         $sql = "DELETE FROM reclamationn WHERE id_rec = :id_rec";
         $db = config::getConnexion();
-        
+
         try {
             $stmt = $db->prepare($sql);
             $stmt->bindValue(':id_rec', $id, PDO::PARAM_INT);
-            $result = $stmt->execute();
-            
-            if ($result === false) {
-                throw new Exception('Échec de la suppression de la réclamation.');
-            }
-            
+            $stmt->execute();
+
             if ($stmt->rowCount() === 0) {
                 throw new Exception('Aucune réclamation trouvée avec cet ID.');
             }
-            
+
             return true;
         } catch (PDOException $e) {
-            error_log("Erreur lors de la suppression de la réclamation : " . $e->getMessage());
+            error_log("Erreur lors de la suppression : " . $e->getMessage());
             throw new Exception('Erreur de suppression : ' . $e->getMessage());
         }
     }
 
-    public function getReclamationsSorted($sort_order = 'DESC')
-    {
-        // Connexion à la base de données avec PDO
+    public function getReclamationsSorted($sort_order = 'DESC') {
         $db = config::getConnexion();
-    
-        // Création de la requête SQL pour trier par ordre décroissant ou ascendant selon le paramètre
-        $sql = "SELECT * FROM reclamationn ORDER BY id_rec " . strtoupper($sort_order);
-    
+        $sort_order = strtoupper($sort_order) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT * FROM reclamationn ORDER BY id_rec $sort_order";
+
         try {
-            // Préparer et exécuter la requête
             $query = $db->prepare($sql);
             $query->execute();
-    
-            // Récupérer et retourner les résultats sous forme de tableau associatif
             return $query->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            // Log l'erreur et affiche un message détaillé si la requête échoue
-            error_log("Erreur lors de la récupération des réclamations triées : " . $e->getMessage());
-            die('Erreur lors de la récupération des réclamations triées. Détails : ' . $e->getMessage());
+            error_log("Erreur de tri : " . $e->getMessage());
+            die('Erreur lors du tri des réclamations : ' . $e->getMessage());
         }
     }
-    public static function getStatistiquesTypeRec($conn)
-    {
+
+    public static function getStatistiquesTypeRec($conn) {
         $sql = "SELECT type_rec, COUNT(*) as total FROM reclamationn GROUP BY type_rec";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public static function getStatistiquesReponseRec()
-{
-    $sql = "SELECT 
-                COUNT(*) as total,
-                SUM(CASE WHEN reponse_rec IS NOT NULL AND reponse_rec != '' THEN 1 ELSE 0 END) AS avecReponse,
-                SUM(CASE WHEN reponse_rec IS NULL OR reponse_rec = '' THEN 1 ELSE 0 END) AS sansReponse
-            FROM reclamationn";
 
-    $db = config::getConnexion();
-    $stmt = $db->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
+    public static function getStatistiquesReponseRec() {
+        $sql = "SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN reponse_rec IS NOT NULL AND reponse_rec != '' THEN 1 ELSE 0 END) AS avecReponse,
+                    SUM(CASE WHEN reponse_rec IS NULL OR reponse_rec = '' THEN 1 ELSE 0 END) AS sansReponse
+                FROM reclamationn";
 
-public static function traduction_form($text, $lang) {
-    $translations = [
-        'fr' => [
-            'Formulaire de Réclamation' => 'Formulaire de Réclamation',
-            'Veuillez remplir ce formulaire pour nous signaler un problème technique.' => 'Veuillez remplir ce formulaire pour nous signaler un problème technique.',
-            'Veuillez remplir ce formulaire pour signaler un problème.' => 'Veuillez remplir ce formulaire pour signaler un problème.',
-            'Nom Prénom :' => 'Nom Prénom :',
-            'Email :' => 'Email :',
-            'Titre du film concerné :' => 'Titre du film concerné :',
-            'Type de problème :' => 'Type de problème :',
-            'Sélectionnez un problème' => 'Sélectionnez un problème',
-            'Lien cassé' => 'Lien cassé',
-            'Qualité mauvaise' => 'Qualité mauvaise',
-            'Langue audio/sous-titre incorrecte' => 'Langue audio/sous-titre incorrecte',
-            'Autre' => 'Autre',
-            'Détails du problème :' => 'Détails du problème :',
-            'Décrivez le problème en détail...' => 'Décrivez le problème en détail...',
-            'Envoyer la réclamation' => 'Envoyer la réclamation',
-            'Accueil' => 'Accueil',
-            'Catalogue' => 'Catalogue',
-            'Événements' => 'Événements',
-            'Achat' => 'Achat',
-            'Réclamation' => 'Réclamation',
-            'Historique' => 'Historique',
-            'Le nom et prénom sont requis' => 'Le nom et prénom sont requis',
-            'L\'email est requis' => 'L\'email est requis',
-            'Format d\'email invalide' => 'Format d\'email invalide',
-            'Le nom du film est requis' => 'Le nom du film est requis',
-            'Le type de réclamation est requis' => 'Le type de réclamation est requis',
-            'Les détails sont requis' => 'Les détails sont requis',
-            'Envoi en cours...' => 'Envoi en cours...',
-        ],
-        'en' => [
-            'Formulaire de Réclamation' => 'Complaint Form',
-            'Veuillez remplir ce formulaire pour nous signaler un problème technique.' => 'Please fill out this form to report a technical issue.',
-            'Veuillez remplir ce formulaire pour signaler un problème.' => 'Please fill out this form to report an issue.',
-            'Nom Prénom :' => 'Full Name:',
-            'Email :' => 'Email:',
-            'Titre du film concerné :' => 'Movie Title:',
-            'Type de problème :' => 'Issue Type:',
-            'Sélectionnez un problème' => 'Select an issue',
-            'Lien cassé' => 'Broken link',
-            'Qualité mauvaise' => 'Poor quality',
-            'Langue audio/sous-titre incorrecte' => 'Incorrect audio/subtitle language',
-            'Autre' => 'Other',
-            'Détails du problème :' => 'Problem details:',
-            'Décrivez le problème en détail...' => 'Describe the issue in detail...',
-            'Envoyer la réclamation' => 'Submit complaint',
-            'Accueil' => 'Home',
-            'Catalogue' => 'Catalog',
-            'Événements' => 'Events',
-            'Achat' => 'Purchase',
-            'Réclamation' => 'Complaint',
-            'Historique' => 'History',
-            'Le nom et prénom sont requis' => 'Full name is required',
-            'L\'email est requis' => 'Email is required',
-            'Format d\'email invalide' => 'Invalid email format',
-            'Le nom du film est requis' => 'Movie title is required',
-            'Le type de réclamation est requis' => 'Complaint type is required',
-            'Les détails sont requis' => 'Details are required',
-            'Envoi en cours...' => 'Sending...',
-        ],
-        'es' => [
-            'Formulaire de Réclamation' => 'Formulario de Reclamación',
-            'Veuillez remplir ce formulaire pour nous signaler un problème technique.' => 'Por favor, complete este formulario para reportar un problema técnico.',
-            'Veuillez remplir ce formulaire pour signaler un problème.' => 'Por favor, complete este formulario para reportar un problema.',
-            'Nom Prénom :' => 'Nombre Completo:',
-            'Email :' => 'Correo Electrónico:',
-            'Titre du film concerné :' => 'Título de la Película:',
-            'Type de problème :' => 'Tipo de Problema:',
-            'Sélectionnez un problème' => 'Seleccione un problema',
-            'Lien cassé' => 'Enlace roto',
-            'Qualité mauvaise' => 'Calidad deficiente',
-            'Langue audio/sous-titre incorrecte' => 'Idioma de audio/subtítulos incorrecto',
-            'Autre' => 'Otro',
-            'Détails du problème :' => 'Detalles del problema:',
-            'Décrivez le problème en détail...' => 'Describa el problema con detalle...',
-            'Envoyer la réclamation' => 'Enviar la reclamación',
-            'Accueil' => 'Inicio',
-            'Catalogue' => 'Catálogo',
-            'Événements' => 'Eventos',
-            'Achat' => 'Compra',
-            'Réclamation' => 'Reclamación',
-            'Historique' => 'Historial',
-            'Le nom et prénom sont requis' => 'El nombre completo es obligatorio',
-            'L\'email est requis' => 'El correo electrónico es obligatorio',
-            'Format d\'email invalide' => 'Formato de correo electrónico inválido',
-            'Le nom du film est requis' => 'El título de la película es obligatorio',
-            'Le type de réclamation est requis' => 'El tipo de reclamación es obligatorio',
-            'Les détails sont requis' => 'Los detalles son obligatorios',
-            'Envoi en cours...' => 'Enviando...',
-        ],
-        'ar' => [
-            'Formulaire de Réclamation' => 'نموذج الشكوى',
-            'Veuillez remplir ce formulaire pour nous signaler un problème technique.' => 'يرجى ملء هذا النموذج للإبلاغ عن مشكلة تقنية.',
-            'Veuillez remplir ce formulaire pour signaler un problème.' => 'يرجى ملء هذا النموذج للإبلاغ عن مشكلة.',
-            'Nom Prénom :' => 'الاسم الكامل:',
-            'Email :' => 'البريد الإلكتروني:',
-            'Titre du film concerné :' => 'عنوان الفيلم:',
-            'Type de problème :' => 'نوع المشكلة:',
-            'Sélectionnez un problème' => 'اختر مشكلة',
-            'Lien cassé' => 'رابط معطل',
-            'Qualité mauvaise' => 'جودة سيئة',
-            'Langue audio/sous-titre incorrecte' => 'لغة الصوت/الترجمة غير صحيحة',
-            'Autre' => 'أخرى',
-            'Détails du problème :' => 'تفاصيل المشكلة:',
-            'Décrivez le problème en détail...' => 'يرجى وصف المشكلة بالتفصيل...',
-            'Envoyer la réclamation' => 'إرسال الشكوى',
-            'Accueil' => 'الرئيسية',
-            'Catalogue' => 'الفهرس',
-            'Événements' => 'الفعاليات',
-            'Achat' => 'الشراء',
-            'Réclamation' => 'الشكوى',
-            'Historique' => 'السجل',
-            'Le nom et prénom sont requis' => 'الاسم الكامل مطلوب',
-            'L\'email est requis' => 'البريد الإلكتروني مطلوب',
-            'Format d\'email invalide' => 'تنسيق البريد الإلكتروني غير صالح',
-            'Le nom du film est requis' => 'عنوان الفيلم مطلوب',
-            'Le type de réclamation est requis' => 'نوع الشكوى مطلوب',
-            'Les détails sont requis' => 'التفاصيل مطلوبة',
-            'Envoi en cours...' => 'جاري الإرسال...',
-        ],
-    ];
-
-    return $translations[$lang][$text] ?? $text;
-}
-// ReclamationController.php
-
-public static function generateQRCodeData($conn, $id_rec) {
-    try {
-        $stmt = $conn->prepare("SELECT * FROM reclamationn WHERE id_rec = :id");
-        $stmt->bindParam(':id', $id_rec);
+        $db = config::getConnexion();
+        $stmt = $db->prepare($sql);
         $stmt->execute();
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+   
+    public function generatePDF() {
+        require_once __DIR__ . '/../lib/dompdf/dompdf/autoload.inc.php';
         
-        if (!$data) {
-            return json_encode([
-                'success' => false,
-                'error' => 'Réclamation non trouvée'
-            ]);
+        // Appel à une méthode pour récupérer les réclamations
+        $reclamations = $this->listReclamations();
+        
+        // Configuration de DomPDF
+        $options = new \Dompdf\Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $options->set('defaultFont', 'Helvetica');
+        $options->set('isRemoteEnabled', true);
+        
+        $dompdf = new \Dompdf\Dompdf($options);
+    
+        // Chemin vers le logo
+        $logoPath = __DIR__ . '/../View/backoffice/assets/img/logo.png';
+        
+        // Convertir l'image en base64
+        $logoData = base64_encode(file_get_contents($logoPath));
+        
+        // Préparation du contenu HTML
+        $html = '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { 
+                    font-family: Helvetica, Arial, sans-serif;
+                    padding: 20px;
+                }
+                .logo-container {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                .logo {
+                    max-width: 150px;
+                    height: auto;
+                }
+                h1 { 
+                    color: #333; 
+                    text-align: center; 
+                    margin-bottom: 20px; 
+                }
+                .header { 
+                    text-align: center; 
+                    margin-bottom: 30px; 
+                }
+                .date { 
+                    text-align: right; 
+                    margin: 10px; 
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 20px; 
+                }
+                th { 
+                    background-color: #333; 
+                    color: white; 
+                    padding: 10px; 
+                }
+                td { 
+                    padding: 8px; 
+                    border-bottom: 1px solid #ddd; 
+                }
+                tr:nth-child(even) { 
+                    background-color: #f2f2f2; 
+                }
+                .footer { 
+                    text-align: center; 
+                    font-size: 12px; 
+                    margin-top: 30px; 
+                }
+            </style>
+        </head>
+        <body>
+            <div class="date">Date: ' . date('d/m/Y') . '</div>
+            <div class="logo-container">
+                <img src="data:image/png;base64,' . $logoData . '" class="logo" alt="MovieVibe Logo">
+            </div>
+            <div class="header">
+                <h1>Liste des Réclamations - MovieVibe</h1>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Réclamation</th>
+                        <th>Nom & Prénom</th>
+                        <th>Email</th>
+                        <th>Film</th>
+                        <th>Type</th>
+                        <th>Réponse</th>
+                    </tr>
+                </thead>
+                <tbody>';
+        
+        // Remplir le tableau avec les réclamations
+        foreach ($reclamations as $reclamation) {
+            $html .= '<tr>
+                <td>' . htmlspecialchars($reclamation['id_rec']) . '</td>
+                <td>' . htmlspecialchars($reclamation['nomprenom']) . '</td>
+                <td>' . htmlspecialchars($reclamation['email']) . '</td>
+                <td>' . htmlspecialchars($reclamation['nomfilm']) . '</td>
+                <td>' . htmlspecialchars($reclamation['type_rec']) . '</td>
+                <td>' . htmlspecialchars($reclamation['reponse_rec']) . '</td>
+            </tr>';
         }
         
-        return json_encode([
-            'success' => true,
-            'reclamation' => $data
-        ]);
-    } catch (PDOException $e) {
-        return json_encode([
-            'success' => false,
-            'error' => 'Erreur : ' . $e->getMessage()
-        ]);
+        $html .= '</tbody>
+            </table>
+            <div class="footer">
+                <p>MovieVibe - Rapport généré le ' . date('d/m/Y à H:i') . '</p>
+                <p>Page {PAGE_NUM} sur {PAGE_COUNT}</p>
+            </div>
+        </body>
+        </html>';
+        
+        // Génération du PDF
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        
+        // Output du PDF
+        return $dompdf->output();
     }
+    public static function generateQRCodeData($conn, $id_rec) {
+        try {
+            $stmt = $conn->prepare("SELECT * FROM reclamationn WHERE id_rec = :id");
+            $stmt->bindParam(':id', $id_rec);
+            $stmt->execute();
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$data) {
+                return json_encode([
+                    'success' => false,
+                    'error' => 'Réclamation non trouvée'
+                ]);
+            }
+            
+            return json_encode([
+                'success' => true,
+                'reclamation' => $data
+            ]);
+        } catch (PDOException $e) {
+            return json_encode([
+                'success' => false,
+                'error' => 'Erreur : ' . $e->getMessage()
+            ]);
+        }
+    }
+    public static function sendMail($id_rec) {
+        try {
+            // Logique pour envoyer l'email
+            // Exemple d'envoi d'email via PHP
+            $emailSent = true;  // Remplacez par la logique d'envoi réelle (comme PHPMailer)
+    
+            if ($emailSent) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Email envoyé avec succès'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Échec de l\'envoi de l\'email'
+                ]);
+            }
+        } catch (Exception $e) {
+            // Si une exception se produit, retourner l'erreur dans la réponse JSON
+            echo json_encode([
+                'success' => false,
+                'error' => 'Une erreur est survenue: ' . $e->getMessage()
+            ]);
+        }
+        exit();  // Terminer le script après avoir renvoyé la réponse JSON
+    }
+    public static function traduction_form($text, $lang) {
+        $translations = [
+            'fr' => [
+                'Formulaire de Réclamation' => 'Formulaire de Réclamation',
+                'Veuillez remplir ce formulaire pour nous signaler un problème technique.' => 'Veuillez remplir ce formulaire pour nous signaler un problème technique.',
+                'Nom Prénom :' => 'Nom Prénom :',
+                'Email :' => 'Email :',
+                'Titre du film concerné :' => 'Titre du film concerné :',
+                'Type de problème :' => 'Type de problème :',
+                'Détails du problème :' => 'Détails du problème :',
+                'Envoyer la réclamation' => 'Envoyer la réclamation',
+                'Accueil' => 'Accueil',
+                'Catalogue' => 'Catalogue',
+                'Nom est requis' => 'Le nom est requis.',
+                'Email est requis' => 'L\'email est requis.',
+                'Email invalide' => 'Email invalide.',
+                'Titre du film est requis' => 'Le titre du film est requis.',
+                'Détails sont requis' => 'Les détails sont requis.',
+                'Événement' => 'Événement',
+                'Réclamation' => 'Réclamation',
+                'Historique' => 'Historique',
+                'Achat' => 'Achat',
+                'Événements' => 'Événements',
+                'Sélectionnez votre problème' => 'Sélectionnez votre problème',
+                'Lien cassé' => 'Lien cassé',
+                'Qualité mauvaise' => 'Qualité mauvaise',
+                'Autre' => 'Autre',
+                'Langue audio/sous-titre incorrecte' => 'Langue audio/sous-titre incorrecte',
+            ],
+            'en' => [
+                'Formulaire de Réclamation' => 'Complaint Form',
+                'Veuillez remplir ce formulaire pour nous signaler un problème technique.' => 'Please fill out this form to report a technical issue.',
+                'Nom Prénom :' => 'Full Name:',
+                'Email :' => 'Email:',
+                'Titre du film concerné :' => 'Movie Title:',
+                'Type de problème :' => 'Issue Type:',
+                'Détails du problème :' => 'Problem details:',
+                'Envoyer la réclamation' => 'Submit complaint',
+                'Accueil' => 'Home',
+                'Catalogue' => 'Catalog',
+                'Nom est requis' => 'Name is required.',
+                'Email est requis' => 'Email is required.',
+                'Email invalide' => 'Invalid email.',
+                'Titre du film est requis' => 'Movie title is required.',
+                'Détails sont requis' => 'Details are required.',
+                'Événement' => 'Event',
+                'Réclamation' => 'Complaint',
+                'Historique' => 'History',
+                'Achat' => 'Purchase',
+                'Événements' => 'Events',
+                'Sélectionnez votre problème' => 'Select your issue',
+                'Lien cassé' => 'Broken link',
+                'Qualité mauvaise' => 'Poor quality',
+                'Autre' => 'Other',
+                'Langue audio/sous-titre incorrecte' => 'Incorrect audio/subtitle language',
+            ],
+            'ar' => [
+                'Formulaire de Réclamation' => 'نموذج الشكوى',
+                'Veuillez remplir ce formulaire pour nous signaler un problème technique.' => 'يرجى ملء هذا النموذج للإبلاغ عن مشكلة فنية.',
+                'Nom Prénom :' => 'الاسم الكامل:',
+                'Email :' => 'البريد الإلكتروني:',
+                'Titre du film concerné :' => 'عنوان الفيلم:',
+                'Type de problème :' => 'نوع المشكلة:',
+                'Détails du problème :' => 'تفاصيل المشكلة:',
+                'Envoyer la réclamation' => 'إرسال الشكوى',
+                'Accueil' => 'الصفحة الرئيسية',
+                'Catalogue' => 'الفهرس',
+                'Nom est requis' => 'الاسم مطلوب.',
+                'Email est requis' => 'البريد الإلكتروني مطلوب.',
+                'Email invalide' => 'البريد الإلكتروني غير صالح.',
+                'Titre du film est requis' => 'عنوان الفيلم مطلوب.',
+                'Détails sont requis' => 'التفاصيل مطلوبة.',
+                'Événement' => 'حدث',
+                'Réclamation' => 'شكوى',
+                'Historique' => 'السجل',
+                'Achat' => 'شراء',
+                'Événements' => 'الأحداث',
+                'Sélectionnez votre problème' => 'اختر مشكلتك',
+                'Lien cassé' => 'رابط معطل',
+                'Qualité mauvaise' => 'جودة سيئة',
+                'Autre' => 'أخرى',
+                'Langue audio/sous-titre incorrecte' => 'لغة الصوت أو الترجمة غير صحيحة',
+            ]
+        ];
+    
+        return $translations[$lang][$text] ?? $text;
+    }
+    public static function traduction_historique($text, $lang = 'fr') {
+    $translations = [
+        'fr' => [
+            'Votre Historique de Réclamations' => 'Votre Historique de Réclamations',
+            'Nom Prénom' => 'Nom Prénom',
+            'Email' => 'Email',
+            'Film Concerné' => 'Film Concerné',
+            'Type de Problème' => 'Type de Problème',
+            'Détails' => 'Détails',
+            'Réponse' => 'Réponse',
+            'Afficher / Masquer les Statistiques' => 'Afficher / Masquer les Statistiques',
+            'Statistiques des Réponses' => 'Statistiques des Réponses',
+            'Avec réponse' => 'Avec réponse',
+            'Sans réponse' => 'Sans réponse',
+            'Home' => 'Accueil',
+            'Catalogue' => 'Catalogue',
+            'Events' => 'Événements',
+            'Achat' => 'Achat',
+            'Réclamation' => 'Réclamation'
+        ],
+        'en' => [
+            'Votre Historique de Réclamations' => 'Your Complaint History',
+            'Nom Prénom' => 'Full Name',
+            'Email' => 'Email',
+            'Film Concerné' => 'Movie',
+            'Type de Problème' => 'Issue Type',
+            'Détails' => 'Details',
+            'Réponse' => 'Response',
+            'Afficher / Masquer les Statistiques' => 'Show / Hide Statistics',
+            'Statistiques des Réponses' => 'Response Statistics',
+            'Avec réponse' => 'With Response',
+            'Sans réponse' => 'Without Response',
+            'Home' => 'Home',
+            'Catalogue' => 'Catalog',
+            'Events' => 'Events',
+            'Achat' => 'Purchase',
+            'Réclamation' => 'Complaint'
+        ],
+        'es' => [
+            'Votre Historique de Réclamations' => 'Tu Historial de Reclamaciones',
+            'Nom Prénom' => 'Nombre y Apellido',
+            'Email' => 'Correo electrónico',
+            'Film Concerné' => 'Película',
+            'Type de Problème' => 'Tipo de Problema',
+            'Détails' => 'Detalles',
+            'Réponse' => 'Respuesta',
+            'Afficher / Masquer les Statistiques' => 'Mostrar / Ocultar Estadísticas',
+            'Statistiques des Réponses' => 'Estadísticas de Respuestas',
+            'Avec réponse' => 'Con Respuesta',
+            'Sans réponse' => 'Sin Respuesta',
+            'Home' => 'Inicio',
+            'Catalogue' => 'Catálogo',
+            'Events' => 'Eventos',
+            'Achat' => 'Compra',
+            'Réclamation' => 'Reclamación'
+        ],
+        'ar' => [
+            'Votre Historique de Réclamations' => 'سجل الشكاوى الخاص بك',
+            'Nom Prénom' => 'الاسم الكامل',
+            'Email' => 'البريد الإلكتروني',
+            'Film Concerné' => 'الفيلم المعني',
+            'Type de Problème' => 'نوع المشكلة',
+            'Détails' => 'التفاصيل',
+            'Réponse' => 'الرد',
+            'Afficher / Masquer les Statistiques' => 'إظهار / إخفاء الإحصائيات',
+            'Statistiques des Réponses' => 'إحصائيات الردود',
+            'Avec réponse' => 'مع رد',
+            'Sans réponse' => 'بدون رد',
+            'Home' => 'الرئيسية',
+            'Catalogue' => 'الفهرس',
+            'Events' => 'الفعاليات',
+            'Achat' => 'شراء',
+            'Réclamation' => 'شكوى'
+        ]
+    ];
+
+    return $translations[$lang][$text] ?? $translations['fr'][$text] ?? $text;
 }
 
-
-
-
 }
-
-    
-    
-    
-
-?>

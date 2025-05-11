@@ -4,13 +4,32 @@ require_once '../../controller/ReclamationController.php';
 
 $stats = ReclamationController::getStatistiquesReponseRec();
 $lang = $_GET['lang'] ?? 'fr'; // par défaut
+
+// Configuration de la pagination
+$items_per_page = 5; // Nombre d'éléments par page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $items_per_page;
+
+// Récupérer le nombre total de réclamations
+$conn = config::getConnexion();
+$total_query = "SELECT COUNT(*) as total FROM reclamationn";
+$total_stmt = $conn->query($total_query);
+$total_records = $total_stmt->fetch(PDO::FETCH_ASSOC)['total'];
+$total_pages = ceil($total_records / $items_per_page);
+
+// Requête avec pagination
+$sql = "SELECT * FROM reclamationn LIMIT :offset, :items_per_page";
+$stmt = $conn->prepare($sql);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
+$stmt->execute();
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?= $lang ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Historique Réclamations</title>
+    <title><?= ReclamationController::traduction_historique('Votre Historique de Réclamations', $lang) ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.png" type="image/png">
     
@@ -128,6 +147,11 @@ $lang = $_GET['lang'] ?? 'fr'; // par défaut
             width: 200px !important;
             height: 200px !important;
         }
+
+        [lang="ar"] {
+            direction: rtl;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -138,11 +162,11 @@ $lang = $_GET['lang'] ?? 'fr'; // par défaut
                 <a href="#"><img src="logo.png" alt="Logo Image"></a>
             </div>
             <ul>
-                <li><a href="page.html">Home</a></li>
-                <li><a href="#">Catalogue</a></li>
-                <li><a href="event.html">Events <i class="fas fa-caret-down"></i></a></li>
-                <li><a href="#">Achat</a></li>
-                <li><a href="./reclamation.php">Réclamation</a></li>
+                <li><a href="page.html"><?= ReclamationController::traduction_historique('Home', $lang) ?></a></li>
+                <li><a href="#"><?= ReclamationController::traduction_historique('Catalogue', $lang) ?></a></li>
+                <li><a href="event.html"><?= ReclamationController::traduction_historique('Events', $lang) ?> <i class="fas fa-caret-down"></i></a></li>
+                <li><a href="#"><?= ReclamationController::traduction_historique('Achat', $lang) ?></a></li>
+                <li><a href="./reclamation.php"><?= ReclamationController::traduction_historique('Réclamation', $lang) ?></a></li>
             </ul>
             <div class="lang-selector">
                 <form method="get" action="">
@@ -150,7 +174,7 @@ $lang = $_GET['lang'] ?? 'fr'; // par défaut
                         <option value="fr" <?= $lang == 'fr' ? 'selected' : '' ?>>Français</option>
                         <option value="en" <?= $lang == 'en' ? 'selected' : '' ?>>English</option>
                         <option value="es" <?= $lang == 'es' ? 'selected' : '' ?>>Español</option>
-                        <option value="ar" <?= $lang == 'ar' ? 'selected' : '' ?>>Arabe</option>
+                        <option value="ar" <?= $lang == 'ar' ? 'selected' : '' ?>>العربية</option>
                     </select>
                 </form>
             </div>
@@ -158,25 +182,21 @@ $lang = $_GET['lang'] ?? 'fr'; // par défaut
     </header>
 
     <div class="container mt-5">
-        <h2 class="text-center mb-4">Votre Historique de Réclamations</h2>
+        <h2 class="text-center mb-4"><?= ReclamationController::traduction_historique('Votre Historique de Réclamations', $lang) ?></h2>
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Nom Prénom</th>
-                    <th>Email</th>
-                    <th>Film Concerné</th>
-                    <th>Type de Problème</th>
-                    <th>Détails</th>
-                    <th>Réponse</th>
+                    <th><?= ReclamationController::traduction_historique('Nom Prénom', $lang) ?></th>
+                    <th><?= ReclamationController::traduction_historique('Email', $lang) ?></th>
+                    <th><?= ReclamationController::traduction_historique('Film Concerné', $lang) ?></th>
+                    <th><?= ReclamationController::traduction_historique('Type de Problème', $lang) ?></th>
+                    <th><?= ReclamationController::traduction_historique('Détails', $lang) ?></th>
+                    <th><?= ReclamationController::traduction_historique('Réponse', $lang) ?></th>
                 </tr>
             </thead>
+            
             <tbody>
-                <?php
-                $sql = "SELECT * FROM reclamationn";
-                $conn = config::getConnexion();
-                $stmt = $conn->query($sql);
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                ?>
+                <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                 <tr>
                     <td><?= htmlspecialchars($row["nomprenom"]) ?></td>
                     <td><?= htmlspecialchars($row["email"]) ?></td>
@@ -185,19 +205,50 @@ $lang = $_GET['lang'] ?? 'fr'; // par défaut
                     <td><?= htmlspecialchars($row["detail"]) ?></td>
                     <td><?= htmlspecialchars($row["reponse_rec"]) ?></td>
                 </tr>
-                <?php } ?>
+                <?php endwhile; ?>
             </tbody>
         </table>
 
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <?php if ($page > 1): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page-1 ?>&lang=<?= $lang ?>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+                            <a class="page-link" href="?page=<?= $i ?>&lang=<?= $lang ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $total_pages): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page+1 ?>&lang=<?= $lang ?>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </nav>
+        </div>
+
         <div id="statistiques" class="container mb-5 d-none">
-            <h4 class="text-center">Statistiques des Réponses</h4>
+            <h4 class="text-center"><?= ReclamationController::traduction_historique('Statistiques des Réponses', $lang) ?></h4>
             <div class="canvas-container">
                 <canvas id="pieChart"></canvas>
             </div>
         </div>
 
         <div class="text-center my-4">
-            <button class="btn btn-outline-primary" onclick="toggleStats()">Afficher / Masquer les Statistiques</button>
+            <button class="btn btn-outline-primary" onclick="toggleStats()">
+                <?= ReclamationController::traduction_historique('Afficher / Masquer les Statistiques', $lang) ?>
+            </button>
         </div>
     </div>
 
@@ -208,9 +259,12 @@ $lang = $_GET['lang'] ?? 'fr'; // par défaut
         }
 
         const data = {
-            labels: ["Avec réponse", "Sans réponse"],
+            labels: [
+                "<?= ReclamationController::traduction_historique('Avec réponse', $lang) ?>",
+                "<?= ReclamationController::traduction_historique('Sans réponse', $lang) ?>"
+            ],
             datasets: [{
-                label: "Réclamations",
+                label: "<?= ReclamationController::traduction_historique('Statistiques des Réponses', $lang) ?>",
                 data: [<?= $stats['avecReponse'] ?>, <?= $stats['sansReponse'] ?>],
                 backgroundColor: ["#28a745", "#dc3545"]
             }]

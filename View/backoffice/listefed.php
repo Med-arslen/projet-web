@@ -34,11 +34,32 @@ $activePage = basename($_SERVER['PHP_SELF']);
       justify-content: center;
       margin-top: 20px;
     }
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background-color: #28a745;
+      color: white;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 1;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .notification.fade-out {
+      opacity: 0;
+    }
   </style>
 </head>
 
 <body>
   <div class="wrapper">
+    <?php if (isset($_GET["success"])): ?>
+    <div id="notification" class="notification">
+      Feedback ajouté avec succès !
+    </div>
+    <?php endif; ?>
     <aside class="sidebar">
       <div class="logo">
         <img src="../backoffice/assets/img/logo.png" alt="Logo MovieVibe" />
@@ -78,6 +99,13 @@ $activePage = basename($_SERVER['PHP_SELF']);
           <div class="content-header">
             <h1>📢 Liste des Feedback</h1>
           </div>
+          <?php if (isset($_GET["msg"])): ?>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <?= htmlspecialchars($_GET["msg"]) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
           <header class="top-bar">
             <div class="search-zone">
               <input type="text" id="searchEventInput" placeholder="🔍 Rechercher un feedback..." onkeyup="filterTable()" />
@@ -96,7 +124,7 @@ $activePage = basename($_SERVER['PHP_SELF']);
               <a href="add_fed.php" class="btn btn-dark py-2 px-4">
                 <i class="fas fa-plus-circle me-2"></i> Ajouter Feedback
               </a>
-              <a href="generate_pdf.php" class="btn btn-danger py-2 px-4 ms-2">
+              <a href="generate_pdf.php" class="btn btn-danger py-2 px-4">
                 <i class="fas fa-file-pdf me-2"></i> Générer PDF
               </a>
             </div>
@@ -167,6 +195,19 @@ $activePage = basename($_SERVER['PHP_SELF']);
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Notification auto-disparition
+    document.addEventListener('DOMContentLoaded', function() {
+      const notification = document.getElementById('notification');
+      if (notification) {
+        setTimeout(() => {
+          notification.classList.add('fade-out');
+          setTimeout(() => {
+            notification.remove();
+          }, 500);
+        }, 4000);
+      }
+    });
+
     function toggleSubMenu(element) {
       const submenu = element.nextElementSibling;
       submenu.style.display = submenu.style.display === "block" ? "none" : "block";

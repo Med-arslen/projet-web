@@ -1,4 +1,8 @@
 <?php
+// Désactiver l'affichage des erreurs
+error_reporting(0);
+ini_set('display_errors', 0);
+
 require_once("../../config/database.php");
 require_once("../../controller/ReclamationController.php");
 
@@ -10,16 +14,47 @@ $statsTypeRec = [];
 try {
     $sqlStats = "SELECT type_rec, COUNT(*) as total FROM reclamationn GROUP BY type_rec";
     $stmtStats = $conn->query($sqlStats);
+    if ($stmtStats === false) {
+        throw new Exception("Erreur lors de l'exécution de la requête SQL");
+    }
     $statsTypeRec = $stmtStats->fetchAll(PDO::FETCH_ASSOC);
+    if ($statsTypeRec === false) {
+        throw new Exception("Erreur lors de la récupération des données");
+    }
 } catch (Exception $e) {
+    error_log("Erreur statistiques: " . $e->getMessage());
     $statsTypeRec = [];
+}
+
+// Assurons-nous que les données sont bien formatées pour JSON
+$statsTypeRec = array_map(function($item) {
+    return [
+        'type_rec' => $item['type_rec'] ?? 'Non spécifié',
+        'total' => (int)($item['total'] ?? 0)
+    ];
+}, $statsTypeRec);
+
+// Traitement de la demande d'envoi d'email
+if (isset($_GET['mail_id'])) {
+    header('Content-Type: application/json; charset=UTF-8');
+    $id_rec = filter_var($_GET['mail_id'], FILTER_VALIDATE_INT);
+    if ($id_rec !== false) {
+        ReclamationController::sendMail($id_rec);
+        exit();
+    } else {
+        echo json_encode([
+            'success' => false,
+            'error' => 'ID de réclamation invalide'
+        ]);
+        exit();
+    }
 }
 
 // Traitement QR code
 if (isset($_GET['qrcode_id'])) {
+    header('Content-Type: application/json; charset=UTF-8');
     $id_rec = filter_var($_GET['qrcode_id'], FILTER_VALIDATE_INT);
     if ($id_rec === false) {
-        header('Content-Type: application/json');
         http_response_code(400);
         echo json_encode([
             'success' => false,
@@ -30,11 +65,9 @@ if (isset($_GET['qrcode_id'])) {
 
     try {
         $response = ReclamationController::generateQRCodeData($conn, $id_rec);
-        header('Content-Type: application/json');
         echo $response;
         exit();
     } catch (Exception $e) {
-        header('Content-Type: application/json');
         http_response_code(500);
         echo json_encode([
             'success' => false,
@@ -148,54 +181,130 @@ Reponse: ${rec.reponse_rec || 'Aucune réponse'}`;
         }
 
         function toggleStats() {
+            console.log('toggleStats appelé');
             const container = document.getElementById("statsContainer");
+            if (!container) {
+                console.error('Container des statistiques non trouvé');
+                return;
+            }
+            console.log('Container trouvé:', container);
+
             const display = container.style.display === "none" ? "block" : "none";
             container.style.display = display;
+            console.log('Display:', display);
             
             if (display === "block" && !container.hasAttribute("data-chart-initialized")) {
-                const statsData = <?php echo json_encode($statsTypeRec); ?>;
-                const labels = statsData.map(item => item.type_rec);
-                const data = statsData.map(item => parseInt(item.total));
-                
-                const ctx = document.getElementById('statsChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: [
-                                '#FF6384',
-                                '#36A2EB',
-                                '#FFCE56',
-                                '#4BC0C0',
-                                '#9966FF'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.raw;
-                                        const total = data.reduce((a, b) => a + b, 0);
-                                        const percentage = ((value / total) * 100).toFixed(1);
-                                        return `${label}: ${value} (${percentage}%)`;
+                try {
+                    console.log('Initialisation du graphique');
+                    // Nettoyage du conteneur
+                    container.innerHTML = '<canvas id="statsChart"></canvas>';
+                    
+                    // Récupération des données
+                    const statsData = <?php 
+                        $jsonData = json_encode($statsTypeRec, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                        if ($jsonData === false) {
+                            echo '[]';
+                        } else {
+                            echo $jsonData;
+                        }
+                    ?>;
+                    console.log('Données statistiques:', statsData);
+                    
+                    if (!Array.isArray(statsData) || statsData.length === 0) {
+                        console.log('Aucune donnée disponible');
+                        container.innerHTML = '<div class="alert alert-info">Aucune donnée disponible pour les statistiques.</div>';
+                        return;
+                    }
+
+                    // Préparation des données
+                    const labels = statsData.map(item => item.type_rec);
+                    const data = statsData.map(item => item.total);
+                    console.log('Labels:', labels);
+                    console.log('Data:', data);
+                    
+                    // Vérification du canvas
+                    const canvas = document.getElementById('statsChart');
+                    if (!canvas) {
+                        console.error('Canvas non trouvé');
+                        throw new Error('Canvas non trouvé');
+                    }
+                    console.log('Canvas trouvé');
+
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        console.error('Contexte 2D non disponible');
+                        throw new Error('Contexte 2D non disponible');
+                    }
+                    console.log('Contexte 2D disponible');
+
+                    // Destruction du graphique existant
+                    if (window.statsChart instanceof Chart) {
+                        console.log('Destruction du graphique existant');
+                        window.statsChart.destroy();
+                    }
+
+                    // Création du nouveau graphique
+                    console.log('Création du nouveau graphique');
+                    window.statsChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: [
+                                    '#FF6384',
+                                    '#36A2EB',
+                                    '#FFCE56',
+                                    '#4BC0C0',
+                                    '#9966FF'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw;
+                                            const total = data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                            return `${label}: ${value} (${percentage}%)`;
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                });
-                
-                container.setAttribute("data-chart-initialized", "true");
+                    });
+                    
+                    container.setAttribute("data-chart-initialized", "true");
+                    console.log('Graphique initialisé avec succès');
+                } catch (error) {
+                    console.error('Erreur détaillée:', error);
+                    container.innerHTML = `<div class="alert alert-danger">Erreur lors de l'affichage des statistiques: ${error.message}</div>`;
+                }
             }
+        }
+
+        function sendMail(id) {
+            fetch(`index.php?mail_id=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Email envoyé avec succès !');
+                    } else {
+                        throw new Error(data.error || 'Erreur lors de l\'envoi de l\'email');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert(`Erreur lors de l'envoi de l'email: ${error.message}`);
+                });
         }
     </script>
 </head>
@@ -251,7 +360,7 @@ Reponse: ${rec.reponse_rec || 'Aucune réponse'}`;
             <a href="tri.php" class="btn btn-dark py-2 px-4">
               <i class="fas fa-sort me-2"></i> Trier Réclamation
             </a>
-            <a href="generate_pdf.php" class="btn btn-danger py-2 px-4">
+            <a href="generate_rec.php" class="btn btn-danger py-2 px-4">
               <i class="fas fa-file-pdf me-2"></i> Générer PDF
             </a>
           </div>
@@ -287,12 +396,12 @@ Reponse: ${rec.reponse_rec || 'Aucune réponse'}`;
                     <td><?= htmlspecialchars($row["detail"]) ?></td>
                     <td><?= htmlspecialchars($row["reponse_rec"]) ?></td>
                     <td>
-                      <a href="edit_rec.php?id=<?= $row["id_rec"] ?>" class="link-dark"><i class="fa-solid fa-pen-to-square fs-5 me-3"></i></a>
-                      <a href="delete_rec.php?id=<?= $row["id_rec"] ?>" class="link-dark" onclick="return confirm('Voulez-vous vraiment supprimer cette réclamation ?')">
+                      <a href="edit_rec.php?id=<?= $row["id_rec"] ?>" class="link-dark"><i class="fa-solid fa-pen-to-square fs-5 me-3"></i></a>                      <a href="delete_rec.php?id=<?= $row["id_rec"] ?>" class="link-dark" onclick="return confirm('Voulez-vous vraiment supprimer cette réclamation ?')">
     <i class="fa-solid fa-trash fs-5 me-3"></i>
 </a>
-
-
+                      <a href="#" onclick="sendMail(<?= $row['id_rec'] ?>); return false;" class="link-dark">
+    <i class="fa-solid fa-envelope fs-5 me-3"></i>
+</a>
                       <a href="#" onclick="showQRCode(<?= $row['id_rec'] ?>); return false;" class="link-dark">
                           <i class="fa-solid fa-qrcode fs-5"></i>
                       </a>

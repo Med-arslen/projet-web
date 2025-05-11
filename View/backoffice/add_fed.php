@@ -19,7 +19,7 @@ if (isset($_POST["submit"])) {
         $feedbackController = new feedbackController();
         $feedbackController->addFeedback($feedbackk);
 
-        header("Location: listefed.php?msg=Feedback ajouté avec succès");
+        header("Location: listefed.php?success=1");
         exit;
     } else {
         echo "L'ID de réclamation est manquant.";
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let isValid = true;
 
-        // Réinitialisation des messages d’erreurs et des styles
+        // Réinitialisation des messages d'erreurs et des styles
         document.getElementById('error-id_rec').textContent = '';
         document.getElementById('error-analyse').textContent = '';
         document.getElementById('error-conseil').textContent = '';
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (!isValid) {
-            e.preventDefault(); // empêche l’envoi du formulaire
+            e.preventDefault(); // empêche l'envoi du formulaire
         }
     });
 });

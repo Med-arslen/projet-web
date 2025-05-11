@@ -162,3 +162,20 @@ async function showQRCode(id) {
         qrContainer.innerHTML = '';
     }
 }
+function sendMail(id) {
+  fetch(`index.php?mail_id=${id}`)
+      .then(response => response.json())  // Récupération de la réponse JSON
+      .then(data => {
+          console.log("Réponse de l'API:", data);  // Affichage de la réponse dans la console pour le debug
+          if (data.success) {
+              alert('Email envoyé avec succès !');
+          } else {
+              throw new Error(data.error || 'Erreur lors de l\'envoi de l\'email');
+          }
+      })
+      .catch(error => {
+          console.error('Erreur:', error);  // Log de l'erreur dans la console
+          alert(`Erreur lors de l'envoi de l'email: ${error.message}`);
+      });
+}
+
