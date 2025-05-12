@@ -54,6 +54,27 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
   <meta name="theme-color" content="#141414"/>
   <title>Gestion des Films - MovieVibe</title>
   <link rel="stylesheet" href="../style.css"/>
+  <style>
+    .table-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px; 
+      margin-left: 1px;
+      margin-right: 150px;
+    }
+
+    table.animated-table {
+      width: 80%;
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+
+    table.animated-table th, table.animated-table td {
+      text-align: center;
+      padding: 10px;
+      border: 1px solid var(--divider);
+    }
+  </style>
   <script src="../script.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 </head>
@@ -171,33 +192,11 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     <?php else: ?>
         Pas de photo
     <?php endif; ?>
-</td>		
+  </td>
   <td>
     <a href="updatefilm.php?id=<?= $film->getId() ?>" class="btn-edit">Modifier</a>
     <a href="deletefilm.php?id=<?= $film->getId() ?>" class="btn-delete" onclick="return confirm('Supprimer ce film ?')">Supprimer</a>
-  </td>
-</tr>
-<tr>
-  <td colspan="8">
-    <div class="comments-section">
-      <h4>Commentaires pour <?= htmlspecialchars($film->getTitre()) ?>:</h4>
-      <?php 
-        $comments = $commentController->getCommentairesByFilm($film->getId());
-        if (count($comments) > 0): 
-      ?>
-        <ul>
-          <?php foreach ($comments as $comment): ?>
-            <li>
-              <strong><?= htmlspecialchars($comment->getAuteur()) ?>:</strong> 
-              <?= htmlspecialchars($comment->getContenu()) ?> 
-              <em>(Note: <?= htmlspecialchars($comment->getNote()) ?>/10)</em>
-            </li>
-          <?php endforeach; ?>
-        </ul>
-      <?php else: ?>
-        <p>Aucun commentaire pour ce film.</p>
-      <?php endif; ?>
-    </div>
+    <a href="filmComments.php?id_film=<?= $film->getId() ?>" class="btn-view-comments">Voir les commentaires</a>
   </td>
 </tr>
 <?php endforeach; ?>

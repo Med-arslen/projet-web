@@ -95,6 +95,27 @@ foreach ($films as $film) {
   <link rel="stylesheet" href="../style.css"/>
   <script src="../commentairegestion.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <style>
+    .table-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px; 
+      margin-left: 1px;
+      margin-right: 150px;
+    }
+
+    table.animated-table {
+      width: 80%;
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+
+    table.animated-table th, table.animated-table td {
+      text-align: center;
+      padding: 10px;
+      border: 1px solid var(--divider);
+    }
+  </style>
 </head>
 <body>
 <div class="wrapper">
