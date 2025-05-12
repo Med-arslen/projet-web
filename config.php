@@ -1,7 +1,7 @@
 
 <?php
 $host = "localhost";
-$dbname = "movievibe";
+$dbname = "project";
 $username = "root";
 $password = "";
 

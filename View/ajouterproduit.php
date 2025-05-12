@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="description" content="MovieVibe - Ajouter un produit"/>
   <meta name="theme-color" content="#141414"/>
   <title>Ajouter un Produit - MovieVibe</title>
+  <link rel="icon" href="logo.png" type="image/png">
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 </head>

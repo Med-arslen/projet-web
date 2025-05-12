@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Boutique</title>
+  <link rel="icon" href="logo.png" type="image/png">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
   <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
@@ -175,11 +176,10 @@
       <div class="movieVibeLogo">
         <a id="logo" href="#home"><img src="logo.png" alt="MovieVibe Logo" id="logo1"></a>
       </div>      
-      <nav class="main-nav">                
-      <a href="#home" class="active" style="font-size: 15px;">Accueil</a>
+      <nav class="main-nav">                  <a href="#home" class="active" style="font-size: 15px;">Accueil</a>
       <a href="#boutique" style="font-size: 15px;">Boutique</a>
       <a href="#evenement" style="font-size: 15px;">Evénement</a>
-      <a href="#reclamations" style="font-size: 15px;">Réclamation</a>
+      <a href="front/reclamation.php" style="font-size: 15px;">Réclamation</a>
 
 
       </nav>

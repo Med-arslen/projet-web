@@ -91,6 +91,7 @@ $statsJson = json_encode($allStatsData);
   <meta name="description" content="MovieVibe - Système de gestion de produits"/>
   <meta name="theme-color" content="#141414"/>
   <title>Gestion des Produits - MovieVibe</title>
+  <link rel="icon" href="logo.png" type="image/png">
   <link rel="stylesheet" href="style.css"/>
   <script defer src="script.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
@@ -103,17 +104,21 @@ $statsJson = json_encode($allStatsData);
       <div class="logo">
         <img src="logo.png" alt="Logo MovieVibe" />
         <h2>MovieVibe</h2>
-      </div>
-      <nav class="menu">
+      </div>      <nav class="menu">
         <a href="<?= buildPaginationUrl(1, 'produits', $pageActuelle, $pageActuelleCommandes) ?>" 
            data-tab="produits" 
            class="tab-button <?= $currentTab === 'produits' ? 'active' : '' ?>">
             <i class="fas fa-box"></i> Produits
-        </a>
-        <a href="<?= buildPaginationUrl(1, 'commandes', $pageActuelleCommandes, $pageActuelle) ?>" 
+        </a>        <a href="<?= buildPaginationUrl(1, 'commandes', $pageActuelleCommandes, $pageActuelle) ?>" 
            data-tab="commandes" 
            class="tab-button <?= $currentTab === 'commandes' ? 'active' : '' ?>">
             <i class="fas fa-shopping-cart"></i> Commandes
+        </a>
+        <a href="../View/backoffice/index.php">
+            <i class="fa-solid fa-bell"></i> Réclamation
+        </a>
+        <a href="../View/backoffice/listefed.php">
+            <i class="fa-solid fa-comment"></i> Feedback
         </a>
       </nav>
       <div class="sidebar-footer">

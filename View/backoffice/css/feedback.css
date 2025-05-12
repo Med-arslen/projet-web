@@ -1,0 +1,74 @@
+/* Applique un fond au body */
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+}
+
+/* Sidebar styling */
+.sidebar {
+    background: #1c1c1c;
+    color: white;
+    height: 100vh;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+}
+
+.sidebar .logo {
+    text-align: center;
+}
+
+.sidebar .logo img {
+    max-width: 100px;
+}
+
+.sidebar .menu {
+    margin-top: 40px;
+}
+
+.sidebar .menu a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.sidebar .menu a:hover {
+    background-color: #f4a261;
+}
+
+/* Main container styling */
+.container {
+    margin-left: 260px;
+    padding-top: 20px;
+}
+
+/* Form styling */
+.form-control {
+    border-radius: 5px;
+    padding: 10px;
+}
+
+button.btn {
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+/* For responsiveness */
+@media (max-width: 768px) {
+    .wrapper {
+        display: block;
+    }
+
+    .sidebar {
+        position: relative;
+        width: 100%;
+    }
+
+    .container {
+        margin-left: 0;
+    }
+}
