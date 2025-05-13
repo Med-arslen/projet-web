@@ -254,7 +254,7 @@
         </div>
       </form>
       <a href="generate_pdf.php" target="_blank" class="btn btn-danger" style="float: right; margin-bottom: 10px;">
-  Télécharger en PDF (Serveur)
+   PDF
 </a>
 
 
@@ -329,14 +329,19 @@
                       <option value="pending" <?= $row['state'] == 'pending' ? 'selected' : '' ?>>Pending</option>
                     </select>
                   </form>
-                </td>
-                <td>
-                  <form action="cancelReservation.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
-                    <input type="hidden" name="id" value="<?= $row["id_reserv"] ?>">
-                    <button type="submit" class="btn btn-link link-dark p-0" title="Cancel Reservation">
-                      <i class="fa-solid fa-trash fs-5"></i>
-                    </button>
-                  </form>
+                </td>                <td>
+                  <div class="d-flex gap-2">
+                    <a href="#" class="btn btn-link link-dark p-0" title="View Reservation Details" 
+                       onclick="showReservationDetails(<?= htmlspecialchars(json_encode($row)) ?>); return false;">
+                      <i class="fa-solid fa-eye fs-5"></i>
+                    </a>
+                    <form action="cancelReservation.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel this reservation?');" style="display:inline;">
+                      <input type="hidden" name="id" value="<?= $row["id_reserv"] ?>">
+                      <button type="submit" class="btn btn-link link-dark p-0" title="Cancel Reservation">
+                        <i class="fa-solid fa-trash fs-5"></i>
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
           <?php } } ?>
@@ -344,7 +349,66 @@
       </table>
     </div>
   </div>
-  
+    <!-- Modal for Reservation Details -->  <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reservationModalLabel">Reservation Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger d-none" id="modal-error"></div>
+          <table class="table">
+            <tbody>
+              <tr>
+                <th style="width: 30%">User ID:</th>
+                <td id="modal-user-id"></td>
+              </tr>
+              <tr>
+                <th>Name:</th>
+                <td id="modal-name"></td>
+              </tr>
+              <tr>
+                <th>Email:</th>
+                <td id="modal-email"></td>
+              </tr>
+              <tr>
+                <th>Event Name:</th>
+                <td id="modal-event-name"></td>
+              </tr>
+              <tr>
+                <th>Reservation Type:</th>
+                <td id="modal-type"></td>
+              </tr>
+              <tr>
+                <th>Reservation Date:</th>
+                <td id="modal-date"></td>
+              </tr>
+              <tr>
+                <th>Number of Tickets:</th>
+                <td id="modal-tickets"></td>
+              </tr>
+              <tr>
+                <th>Total Price:</th>
+                <td id="modal-price"></td>
+              </tr>
+              <tr>
+                <th>Status:</th>
+                <td id="modal-state"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <a id="pdf-export-btn" href="#" class="btn btn-danger" target="_blank" data-reservation-id="">
+            <i class="fas fa-file-pdf"></i> Export to PDF
+          </a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     function toggleSubMenu(element) {
       const submenu = element.nextElementSibling;
@@ -354,10 +418,39 @@
         const icon = element.querySelector(".submenu-icon");
         if (icon) icon.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
       }
+    }    function showReservationDetails(data) {
+      console.log('Reservation data:', data); // Debug log
+      
+      // Update modal content
+      document.getElementById('modal-user-id').textContent = data.id_user;
+      document.getElementById('modal-name').textContent = data.name;
+      document.getElementById('modal-email').textContent = data.email;
+      document.getElementById('modal-event-name').textContent = data.name_event;
+      document.getElementById('modal-type').textContent = data.type;
+      document.getElementById('modal-date').textContent = data.date_reserv;
+      document.getElementById('modal-tickets').textContent = data.nb_people;
+      document.getElementById('modal-price').textContent = data.price + ' DT';
+      document.getElementById('modal-state').textContent = data.state;
+
+      // Update PDF export button URL
+      const pdfBtn = document.getElementById('pdf-export-btn');
+      const reservId = data.id_reserv;
+      if (reservId) {
+        pdfBtn.href = `generate_reservation_pdf.php?id=${reservId}`;
+        pdfBtn.style.display = 'inline-block'; // Show the button
+      } else {
+        console.error('No reservation ID found in data:', data);
+        pdfBtn.style.display = 'none'; // Hide the button if no ID
+      }
+
+      // Show the modal
+      const modal = new bootstrap.Modal(document.getElementById('reservationModal'));
+      modal.show();
     }
   </script>
 
-
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
