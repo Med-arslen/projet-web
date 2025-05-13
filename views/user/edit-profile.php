@@ -128,18 +128,22 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'user') {
                 ?>
             </div>
         <?php endif; ?>
-        
-        <form action="../../controllers/UserController.php" method="POST">
+          <form action="../../controllers/update-profile-handler.php" method="POST">
             <input type="hidden" name="action" value="updateProfile">
             
             <div class="form-group">
                 <label for="name">Nom</label>
-                <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($_SESSION['user']['name'] ?? ''); ?>" >
+                <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($_SESSION['name'] ?? ''); ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? ''); ?>" >
+                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="current_password">Mot de passe actuel (requis)</label>
+                <input type="password" id="current_password" name="current_password" required>
             </div>
 
             <div class="form-group">

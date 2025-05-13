@@ -18,8 +18,6 @@ if (!isset($_SESSION['role'])) {
 <head>
   <meta charset="UTF-8" />
   <title>Tableau de bord - MovieVibe</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       margin: 0;
@@ -146,7 +144,7 @@ if (!isset($_SESSION['role'])) {
       transform: scale(1.05);
     }
 
-    /* Style pour la section statistiques */
+    /* Styles pour la section statistiques */
     .stats-section {
       background-color: rgba(0, 0, 0, 0.8);
       padding: 30px;
@@ -250,6 +248,8 @@ if (!isset($_SESSION['role'])) {
       margin-top: 5px;
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="dashboard-header">
@@ -259,28 +259,27 @@ if (!isset($_SESSION['role'])) {
       <button type="submit" class="logout-btn">Se déconnecter</button>
     </form>
   </div>
-
   <div class="welcome-msg">
-    <h2>Bienvenue <?php echo isset($_SESSION['user']['name']) ? htmlspecialchars($_SESSION['user']['name']) : 'Utilisateur'; ?> !</h2>
+    <h2>Bienvenue <?php echo isset($_SESSION['name']) ? htmlspecialchars($_SESSION['name']) : 'Utilisateur'; ?> !</h2>
     <p>Vous êtes connecté à votre espace personnel. Explorez nos films et séries ! 🍿</p>
   </div>
 
   <div class="profile-section">
     <div class="profile-header">
       <div class="profile-avatar">
-        <?php echo strtoupper(substr($_SESSION['user']['name'] ?? 'U', 0, 1)); ?>
+        <?php echo strtoupper(substr($_SESSION['name'] ?? 'U', 0, 1)); ?>
       </div>
       <h3>Mon Profil</h3>
     </div>
     <div class="profile-info">
       <span class="profile-label">Nom :</span>
-      <span class="profile-value"><?php echo htmlspecialchars($_SESSION['user']['name'] ?? ''); ?></span>
+      <span class="profile-value"><?php echo htmlspecialchars($_SESSION['name'] ?? ''); ?></span>
       
       <span class="profile-label">Email :</span>
-      <span class="profile-value"><?php echo htmlspecialchars($_SESSION['user']['email'] ?? ''); ?></span>
+      <span class="profile-value"><?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?></span>
       
       <span class="profile-label">Membre depuis :</span>
-      <span class="profile-value"><?php echo isset($_SESSION['user']['created_at']) ? date('d/m/Y', strtotime($_SESSION['user']['created_at'])) : ''; ?></span>
+      <span class="profile-value"><?php echo isset($_SESSION['created_at']) ? date('d/m/Y', strtotime($_SESSION['created_at'])) : ''; ?></span>
     </div>
     <a href="user/edit-profile.php" class="edit-profile-btn">Modifier mon profil</a>
   </div>

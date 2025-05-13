@@ -146,6 +146,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             </div>
 
             <div class="form-group">
+                <label for="current_password">Mot de passe actuel</label>
+                <input type="password" id="current_password" name="current_password">
+            </div>
+
+            <div class="form-group">
                 <label for="new_password">Nouveau mot de passe (laisser vide si inchangé)</label>
                 <input type="password" id="new_password" name="new_password">
             </div>
@@ -161,5 +166,71 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             </div>
         </form>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const name = document.getElementById('name');
+            const email = document.getElementById('email');
+            const currentPassword = document.getElementById('current_password');
+            const newPassword = document.getElementById('new_password');
+            const confirmPassword = document.getElementById('confirm_password');
+
+            form.addEventListener('submit', function(e) {
+                let hasError = false;
+                let errorMessage = '';
+
+                // Validation du nom
+                if (name.value.trim().length < 2) {
+                    errorMessage += "Le nom doit contenir au moins 2 caractères.\n";
+                    hasError = true;
+                }
+
+                // Validation de l'email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email.value.trim())) {
+                    errorMessage += "L'email n'est pas valide.\n";
+                    hasError = true;
+                }
+
+                // Validation des mots de passe
+                if (newPassword.value) {
+                    if (!currentPassword.value) {
+                        errorMessage += "Veuillez entrer votre mot de passe actuel.\n";
+                        hasError = true;
+                    }
+                    if (newPassword.value.length < 8) {
+                        errorMessage += "Le nouveau mot de passe doit contenir au moins 8 caractères.\n";
+                        hasError = true;
+                    }
+                    if (newPassword.value !== confirmPassword.value) {
+                        errorMessage += "Les mots de passe ne correspondent pas.\n";
+                        hasError = true;
+                    }
+                }
+
+                if (hasError) {
+                    e.preventDefault();
+                    alert(errorMessage);
+                }
+            });
+
+            // Validation en temps réel
+            newPassword.addEventListener('input', function() {
+                if (this.value.length > 0 && this.value.length < 8) {
+                    this.setCustomValidity('Le mot de passe doit contenir au moins 8 caractères');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            confirmPassword.addEventListener('input', function() {
+                if (this.value !== newPassword.value) {
+                    this.setCustomValidity('Les mots de passe ne correspondent pas');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

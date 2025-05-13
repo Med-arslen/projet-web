@@ -61,12 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 session_regenerate_id(true);
                 $_SESSION = array();
                 
-                $_SESSION['user'] = [
-                    'id' => $user['id'],
-                    'email' => $user['email'],
-                    'name' => $user['name'],
-                    'role' => 'user'
-                ];
+                // Définir les variables de session
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['name'] = $user['name'];
                 $_SESSION['role'] = 'user';
                 
                 header('Location: ../views/dashboard.php');
