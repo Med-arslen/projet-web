@@ -317,7 +317,7 @@ Reponse: ${rec.reponse_rec || 'Aucune réponse'}`;
       </div>
       <nav class="menu">
         <a data-attr="client"><i class="fa-solid fa-user"></i> Client</a>
-        <a data-attr="film"><i class="fa-solid fa-film"></i> Films</a>
+        <a href="http://localhost/arslenemna/CrudWeb/View/backoffice/"><i class="fa-solid fa-film"></i> Films</a>
         <a href="../index.php"><i class="fa-solid fa-cart-shopping"></i> Produits</a>
 
         <a data-attr="event" class="has-submenu" onclick="toggleSubMenu(this)">

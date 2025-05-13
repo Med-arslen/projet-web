@@ -336,7 +336,7 @@ $lang = $_GET['lang'] ?? 'fr';
       <div class="netflixLogo">
         <a id="logo" href="#home"><img src="logo.png" alt="Logo Movie Vibe" id="logo1"></a>
       </div>      <ul>
-  <li><a href="page.html"><?= ReclamationController::traduction_form('Accueil', $lang) ?></a></li>
+  <li><a href="http://localhost/arslenemna/CrudWeb/View/frontoffice/page.php"><?= ReclamationController::traduction_form('Accueil', $lang) ?></a></li>
   <li><a href="../page.php"><?= ReclamationController::traduction_form('Boutique', $lang) ?></a></li>
   <li><a href="event.html"><?= ReclamationController::traduction_form('Evénement', $lang) ?></a></li>
   <li class="reclamation">

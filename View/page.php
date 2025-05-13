@@ -176,7 +176,7 @@
       <div class="movieVibeLogo">
         <a id="logo" href="#home"><img src="logo.png" alt="MovieVibe Logo" id="logo1"></a>
       </div>      
-      <nav class="main-nav">                  <a href="#home" class="active" style="font-size: 15px;">Accueil</a>
+      <nav class="main-nav">                  <a href="http://localhost/arslenemna/CrudWeb/View/frontoffice/page.php" class="active" style="font-size: 15px;">Accueil</a>
       <a href="#boutique" style="font-size: 15px;">Boutique</a>
       <a href="#evenement" style="font-size: 15px;">Evénement</a>
       <a href="front/reclamation.php" style="font-size: 15px;">Réclamation</a>

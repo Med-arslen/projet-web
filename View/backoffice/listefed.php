@@ -69,7 +69,7 @@ $activePage = basename($_SERVER['PHP_SELF']);
         <a href="../client/listeClient.php" class="<?= $activePage == 'listeClient.php' ? 'active' : '' ?>">
           <i class="fa-solid fa-user"></i> Client
         </a>
-                <a href="../film/listeFilm.php" class="<?= $activePage == 'listeFilm.php' ? 'active' : '' ?>">
+                <a href="http://localhost/arslenemna/CrudWeb/View/backoffice/" >
           <i class="fa-solid fa-film"></i> Films
         </a>
                 <a href="../index.php"><i class="fa-solid fa-cart-shopping"></i> Produits</a>

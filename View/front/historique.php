@@ -162,7 +162,7 @@ $stmt->execute();
                 <a href="#"><img src="logo.png" alt="Logo Image"></a>
             </div>
             <ul>
-  <li><a href="page.html"><?= ReclamationController::traduction_form('Accueil', $lang) ?></a></li>
+  <li><a href="http://localhost/arslenemna/CrudWeb/View/frontoffice/page.php"><?= ReclamationController::traduction_form('Accueil', $lang) ?></a></li>
   <li><a href="../page.php"><?= ReclamationController::traduction_form('Boutique', $lang) ?></a></li>
   <li><a href="event.html"><?= ReclamationController::traduction_form('Evénement', $lang) ?></a></li>
                 <li><a href="./reclamation.php"><?= ReclamationController::traduction_historique('Réclamation', $lang) ?></a></li>
